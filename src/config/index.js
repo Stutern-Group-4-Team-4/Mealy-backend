@@ -13,4 +13,4 @@ const config =
     ? { ...staging }
     : { ...production };
 
-    module.exports = config
+    module.exports = config;

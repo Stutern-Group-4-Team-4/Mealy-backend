@@ -1,3 +1,4 @@
+//Not found error
 class NotFoundError extends Error {
     constructor(message) {
       super(message);
@@ -6,6 +7,7 @@ class NotFoundError extends Error {
     }
   }
   
+  //Bad user request error
   class BadUserRequestError extends Error {
     constructor(message) {
       super(message);
@@ -13,6 +15,8 @@ class NotFoundError extends Error {
       this.errorType = "BadUserRequestError";
     }
   }
+
+  //Unauthorized error
   class UnAuthorizedError extends Error {
     constructor(message) {
       super(message);
