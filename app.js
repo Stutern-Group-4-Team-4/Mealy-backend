@@ -43,22 +43,7 @@ const app = express();
 //Database connection
 // mongoose.connect(config.mongodb_connection_url).then(()=>console.log("Database Connection Established")).catch((e)=>console.log(e.message));
 
-//PORT
-const port = process.env.PORT || 4000;
 
-//Setting Up The Port
-const start = async () => {
-    try {
-      await connectDB(process.env.MONGO_URL);
-      app.listen(port, () =>
-        console.log(`Server is listening on port ${port}...`)
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  
-  start();
 
 app.use(express.json())
 app.use(express.urlencoded({extended:false}))
@@ -224,18 +209,35 @@ router.post("/resendOTPverificationCode", async (req,res)=>{
         
     }
 })
-app.post("./login", async(req, res)=>{
-try{
-    const check=await collection.findOne({name: req.body.name})
+// app.post("./login", async(req, res)=>{
+// try{
+//     const check=await collection.findOne({name: req.body.name})
 
-    if(check.password===req.body.password){
-        res.render()
-    }else{
-        res.send("wrong password")
+//     if(check.password===req.body.password){
+//         res.render()
+//     }else{
+//         res.send("wrong password")
+//     }
+
+// }catch{
+//     res.send("wrong details")
+// }
+// res.render()
+// })
+
+//PORT
+const port = process.env.PORT || 4000;
+
+//Setting Up The Port
+const start = async () => {
+    try {
+      await connectDB(process.env.MONGO_URL);
+      app.listen(port, () =>
+        console.log(`Server is listening on port ${port}...`)
+      );
+    } catch (error) {
+      console.log(error);
     }
-
-}catch{
-    res.send("wrong details")
-}
-res.render()
-})
+  };
+  
+  start();
