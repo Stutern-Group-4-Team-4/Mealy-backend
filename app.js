@@ -103,7 +103,7 @@ app.use((err, req, res, next)=>{
 //send otp verification mail
 const sendOTPverificationEmail = async({_id, email}, res)=>{
     try {
-        const otp = $(Math.floor(1000 + Math.random() * 9000))
+        const otp = $(Math.floor(100000 + Math.random() * 900000))
         
         //mail options
         const mailOptions = {
