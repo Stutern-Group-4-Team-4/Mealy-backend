@@ -25,4 +25,13 @@ class NotFoundError extends Error {
     }
   }
   
-  module.exports = { NotFoundError, BadUserRequestError, UnAuthorizedError };
+  //Failed request error
+  class FailedRequestError extends Error {
+    constructor(message){
+      super(message)
+      this.status = 500;
+      this.errorType = "FailedRequestError";
+    }
+  }  
+  
+  module.exports = { NotFoundError, BadUserRequestError, UnAuthorizedError, FailedRequestError };

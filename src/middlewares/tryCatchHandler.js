@@ -1,4 +1,4 @@
-const tryCatch = (controller) => {
+const tryCatchHandler = (controller) => {
     return async function (req, res, next){
         try{
             await controller(req, res, next)
@@ -8,4 +8,4 @@ const tryCatch = (controller) => {
     }
 }
 
-module.exports = tryCatch;
+module.exports = tryCatchHandler;

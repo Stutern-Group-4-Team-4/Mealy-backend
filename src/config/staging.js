@@ -1,7 +1,9 @@
-import dotenv from "dotenv";
+const dotenv = require ("dotenv");
 dotenv.config()
 
-export const staging = {
+ const staging = {
     mongodb_connection_url: process.env.STAGING_MONGODB_CONNECTION_URL,
     port: +process.env.PORT
 };
+
+module.exports = staging;

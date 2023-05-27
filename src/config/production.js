@@ -1,9 +1,11 @@
-import dotenv from "dotenv";
+const dotenv = require ("dotenv");
 dotenv.config()
 
 
 const production = {
-  MONGODB_CONNECTION_URL: process.env.PRODUCTION_MONGODB_CONNECTION_URL,
+  mongodb_connection_url: process.env.mongodb_connection_url,
+  bycrypt_salt_round: +process.env.bycrypt_salt_round,
+  jwt_secret_key: process.env.PRODUCTION_JWT_SECRET,
   PORT: +process.env.PORT,
 };
 

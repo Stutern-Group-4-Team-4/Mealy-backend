@@ -1,7 +1,12 @@
-import dotenv from "dotenv";
+const dotenv = require ("dotenv");
 dotenv.config()
 
-export const development = {
-    mongodb_connection_url: ProcessingInstruction.env.DEV_MONGODB_CONNECTION_URL,
+ const development = {
+    mongodb_connection_url: process.env.mongodb_connection_url,
+    bycrypt_salt_round: +process.env.bycrypt_salt_round,
+    jwt_secret_key: process.env.DEV_JWT_SECRET,
+    jwt_expire: process.env.DEV_JWT_EXPIRE,
     port: +process.env.PORT
 };
+
+module.exports = development;
