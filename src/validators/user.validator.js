@@ -2,6 +2,7 @@ const Joi = require ('joi');
 
 const createUserValidator = Joi.object({
   name: Joi.string().min(3).max(30).required(),
+  phoneno: Joi.string().length(11).regex(/^\d+$/).required(),
   email: Joi.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
   .required()
   .messages({
@@ -14,6 +15,7 @@ const createUserValidator = Joi.object({
   }),
   confirmPassword: Joi.string().valid(Joi.ref('password')).required()
 }).strict()
+
 
 const loginUserValidator = Joi.object({
   email: Joi.string().required(),

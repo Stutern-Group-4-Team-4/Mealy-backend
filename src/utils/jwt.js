@@ -1,5 +1,5 @@
 const jwt = require ("jsonwebtoken")
-const config = require ("../config/index.js")
+const config = require ("../config/development")
 
  function generateToken(user){
   const payload = {_id: user._id}

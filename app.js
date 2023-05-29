@@ -1,5 +1,5 @@
 // Env variables
-const ai = require("dotenv").config();
+require("dotenv").config();
 
 //express
 const express = require("express");
@@ -42,6 +42,9 @@ const bcrypt = require("bcrypt");
 
 //mongodb user otp verification model
 const userOTPverification = require("./src/model/userOTPverification");
+
+//mongodb user
+const user = require("./src/model/user.js")
 
 //built-in middleware for json
 app.use(express.json());

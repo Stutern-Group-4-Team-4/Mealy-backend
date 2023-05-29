@@ -2,13 +2,31 @@ const { createUserValidator, loginUserValidator, resetPasswordValidator } = requ
 const { BadUserRequestError, NotFoundError, UnAuthorizedError } = require ("../error/error.js")
 const User = require ("../model/user.js")
 const bcrypt = require ("bcrypt")
+const nodemailer = require("nodemailer")
+require("dotenv").config();
 const {config} = require ("../config/index.js")
 const crypto = require ("crypto")
-const { sendEmail } = require ("../utils/sendEmail.js")
+const Sib = require('sib-api-v3-sdk')
 const { FailedRequestError } = require ("../error/error.js")
 const { generateToken } = require ("../utils/jwt.js")
 const jwt = require ("jsonwebtoken")
 const cookieParser = require ("cookie-parser")
+
+const client = Sib.ApiClient.instance
+
+const apiKey = client.authentications['api-key']
+apiKey.apiKey = process.env.API_KEY;
+
+const transEmailApi = new Sib.TransactionalEmailsApi()
+
+const Transport = require("nodemailer-sendinblue-transport");
+
+
+const transporter = nodemailer.createTransport(
+    new Transport({ apiKey: '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' })
+);
+
+
 
 
 
@@ -18,19 +36,15 @@ const cookieParser = require ("cookie-parser")
     static async createUser(req, res ) {
       // Joi validation
       const {error} = createUserValidator.validate(req.body)
-      if (error) throw error
-      const { name, phonenumber, email, password, confirmPassword } = req.body;
+      if (error) throw error;
+      const { name, phoneno, email, password, confirmPassword } = req.body;
 
       const usernameExists = await User.find({ name });
       if (usernameExists.length > 0)
         throw new BadUserRequestError(
           "An account with this username already exists."
         );
-      const numberExists = await User.find({ phonenumber });
-      if (numberExists.length > 0)
-        throw new BadUserRequestError(
-          "An account with this username already exists."
-        );
+      
 
 
       // Confirm  email has not been used by another user
@@ -39,53 +53,107 @@ const cookieParser = require ("cookie-parser")
         if (existingUser.isVerified) {
           throw new BadUserRequestError(`An account with ${email} already exists.`);
         } else {
-          throw new BadUserRequestError(`Please login to ${email} to get your verification link.`);
+          throw new BadUserRequestError(`Please login with ${email} to get your verification link.`);
         }
       }
-
+       
+      
        // Generate verification token
        const saltRounds = 10;
-       // Hash verification token
+       // Hash verification token/one-time password(otp)
        const verifyEmailToken = Math.floor(100000 + Math.random() * 900000);
+
+       
        // Hash password
        const hashedPassword = bcrypt.hashSync(password, saltRounds);
-       const hashedConfirmedPassword = bcrypt.hashSync(confirmPassword, saltRounds);
-       const user = await User.updateOne ({
-       name: "Emmanuel Oyelakin",
-       phonenumber: "07059944977",
-       email: "dejioyelakin@gmail.com",
-       password: hashedPassword,
-       confirmPassword: hashedConfirmedPassword,
-       verifyEmailToken,
-       verifyEmailTokenExpire: Date.now() + 15 * 60 * 1000,
-       },
-       res.status(201).json({
-        status: "Success",
-        message: "A new user has been created successfully",
-        data: {
-            user: user
-        }
-       })
-       );
+       
+       
+      const user =  {
+        name: req.body.name,
+        phoneno: req.body.phoneno,
+        email: req.body.email,
+        password: hashedPassword,
+        confirmPassword: hashedPassword,
+        verifyEmailToken,
+        verifyEmailTokenExpire: Date.now() + 15 * 60 * 1000,
+        };
+
+        const newUser = await User.create(user);
+        res.status(201).json({
+          message: "A new user has been created successfully",
+          status: "Success",
+          data: {
+            user: newUser
+          },
+        });
+     
+      
+     
+      
 
        await user.save()
       // create reset URL
       // const verifyEmailUrl = `${req.protocol}://${req.get('host')}/api/v1/user/verify/${verifyEmailToken}`;
       // Set body of email
-      const message = `Your account verification code is: ${verifyEmailToken}`
-      const mailSent = await sendEmail({
-        email: user.email,
-        subject: 'Email verification',
-        message
-      })
+      
+      
+  }
+
+
+  static async sendVerificationCode(req, res) {
+    const {email} = req.body;
+    // const emailExists = await User.find({ email });
+    // if (emailExists.length > 0)
+    //   throw new BadUserRequestError(
+    //     "A user with this email address already exists"
+    //   );
+      // Hash verification token/one-time password(otp)
+      const verifyEmailToken = Math.floor(100000 + Math.random() * 900000);
+      //send an email revealing otp
+      const mailSent = await transporter.sendMail({
+        from: 'dejioyelakin@gmail.com',
+        to: email,
+        subject: 'Mealy OTP verification',
+        text: `Your account verification code is: ${verifyEmailToken}`
+      });
       if(mailSent === false) throw new NotFoundError(`${email} cannot be verified. Please provide a valid email address`)
       console.log(mailSent)
       res.status(200).json({
         status: 'Success',
-        message: `An email verification link has been sent to ${email}.`,
-        message
+        message: `An email verification link has been sent to ${email}. Your account verification code is: ${verifyEmailToken}`,
+        
       })
+    
   }
+  static async resendVerificationCode(req, res) {
+    const {email} = req.query;
+  
+      // Hash a new verification token/one-time password(otp)
+      const newEmailToken = Math.floor(100000 + Math.random() * 900000);
+      //send an email revealing new otp
+      const mailSent = await transporter.sendMail({
+        from: 'dejioyelakin@gmail.com',
+        to: email,
+        subject: 'Mealy OTP verification',
+        text: `Your account verification code is: ${newEmailToken}`
+      });
+      const update = { $set: { verifyEmailToken: newEmailToken } };
+      const user = await User.updateOne({ email: email }, update);
+      if(mailSent === false) throw new NotFoundError(`${email} cannot be verified. Please provide a valid email address`)
+      console.log(mailSent)
+      res.status(200).json({
+        status: 'Success',
+        message: `An email verification link has been sent to ${email}. Your account verification code is: ${verifyEmailToken}`,
+        data: {
+          user
+        }
+      
+        
+      })
+    
+  }
+
+
   static async verifyUser(req, res) {
     const verifyEmailToken = req.body.verifyEmailToken;
     // Find the user by the verification token
@@ -113,13 +181,13 @@ const cookieParser = require ("cookie-parser")
     const { error } = loginUserValidator.validate(req.body)
     if (error) throw error
     const { email, password } = req.body;
-    //if (!email && !password) throw new BadUserRequestError("Please provide a username and email before you can login.")
+
     const user = await User.findOne({ email }).select('+password')
-    //if(!user.isVerified) throw new UnAuthorizedError ('Please verify your account')
+    
     if(!user) throw new UnAuthorizedError("Invalid login details")
     // Compare Passwords
-    const isMatch = bcrypt.compareSync(password, user.password)
-    if(!isMatch) throw new UnAuthorizedError("Invalid login details")
+    const passwordsMatch = bcrypt.compareSync(password, user.password)
+    if(!passwordsMatch) throw new UnAuthorizedError("Invalid login details")
     const token = generateToken(user)
     res.status(200).json({
       status: "Success",
@@ -138,26 +206,54 @@ const cookieParser = require ("cookie-parser")
     const user = await User.findOne({ email })
     if (!user) throw new UnAuthorizedError("Please provide a valid email address")
     // Get reset token
-    const resetPasswordToken = user.getResetPasswordToken();
+
+    const getResetPasswordToken=()=> {
+      const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      let token = "";
+      for (let t = 0; t < 10; t++){
+        token += characters.charAt(
+          Math.floor(Math.random()*characters.length)
+        )
+      }
+      return token;
+    }
+    const resetPasswordToken = getResetPasswordToken();
+
+    const newUser = {
+      resetPasswordToken: resetPasswordToken,
+      resetTokenExpiration: Date.now() + 3600000 //expires in 1 hour
+    }
     
-    await user.save({ validateBeforeSave: false })
+    await User.updateOne({ email: email }, newUser)
+    await user.save();
+
+    const transporter = nodemailer.createTransport(mailer);
 
     // create reset URL
-    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/user/resetpassword/${resetPasswordToken}`;
+    const resetUrl = `http://mealy-backend.onrender.com/api/v1/user/resetpassword/${resetPasswordToken}`;
 
-    const message = `You are receiving this email because you requested for a password reset. Please click the following link to reset your password: \n\n ${resetUrl}`
-    
-    await sendEmail({
-        email:user.email,
-        subject: 'Password reset',
-        message
-      })
-
+    const mailOptions = {
+      from: "dejioyelakin@gmail.com",
+      to: email,
+      subject: "Password Reset",
+      text: `
+      You are receiving this email because you requested for a password reset. Please click the following link to reset your password: \n\n ${resetUrl}
+       `,
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        throw new Error("Error sending reset email");
+      }
+      console.log("Reset email sent:", info.response);
       res.status(200).json({
-        status: 'Success',
-        message: `A password reset link has been sent to ${email}`,
-        message
-      })
+        message: 'A password reset link has been sent to: ${email}',
+        data: {
+          user: user,
+          message: mailOptions,
+        },
+      });
+    });
 
   }
 // // Validate the new password
@@ -168,18 +264,23 @@ const cookieParser = require ("cookie-parser")
     .createHash('sha256')
     .update(req.params.resetPasswordToken)
     .digest('hex');
-    //const { id } = req.query
+    // Set Password
+    const { error } = resetPasswordValidator.validate(req.body)
+    if (error) throw error;
+
+    const {password, confirmPassword} = req.body;
+    
+    //Find the user by the reset token
     const user = await User.findOne({
-      resetPasswordToken,
+      resetPasswordToken: resetPasswordToken,
       resetPasswordExpire: { $gt: Date.now() }
     })
     if (!user) throw new UnAuthorizedError('Unauthorized')
     console.log(user)
-    // Set Password
-    const { error } = resetPasswordValidator.validate(req.body)
-    if (error) throw error
-    const saltRounds = config.bycrypt_salt_round
-    user.password = bcrypt.hashSync(req.body.password, saltRounds);
+    
+    //hash password
+    const saltRounds = 10;
+    const hashPassword = bcrypt.hashSync(req.body.password, saltRounds);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     await user.save();
@@ -188,7 +289,17 @@ const cookieParser = require ("cookie-parser")
     status: "Success",
     message: "Password updated successfully",
     data: user
-    })
+    });
+
+    //update the user's password
+    await User.updateOne(
+      {resetPasswordToken: resetPasswordToken},
+      {
+        password: hashPassword, 
+        confirmPassword: hashPassword
+      }
+
+    )
   }
 
 

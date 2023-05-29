@@ -5,17 +5,20 @@ const crypto = require ("crypto");
 const userSchema = new mongoose.Schema({
     name: {
       type: String,
-      required: [true],
+      required: true,
       min: 3,
       max: 100
     },
-    phonenumber: {
+    phoneno: {
       type: String,
-      required: [true],
+      required: true,
+      
+
     },
+    
     email: {
       type: String,
-      required: [true],
+      required: true,
       unique: true,
       lowercase: true,
       immutable: true,
@@ -26,7 +29,7 @@ const userSchema = new mongoose.Schema({
       }, 
     password: {
       type: String,
-      required: [true],
+      required: true,
       min: 8,
       max: 16,
     },
@@ -46,6 +49,8 @@ const userSchema = new mongoose.Schema({
   timestamps: true
  }  
   )
+
+  
   
   
 
@@ -65,7 +70,7 @@ const userSchema = new mongoose.Schema({
 
   }
 
-  const User = mongoose.model("user", userSchema);
+  const User = mongoose.model("User", userSchema);
   
   
   module.exports =  User;

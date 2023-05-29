@@ -1,7 +1,7 @@
-import { UnAuthorizedError} from "../error/error.js"
-import {verifyToken} from "../utils/jwt.js"
+const { UnAuthorizedError}=require  ("../error/error.js")
+const {verifyToken} =require ("../utils/jwt.js")
 
-export function userAuthMiddleWare(req, res, next){
+ function userAuthMiddleWare(req, res, next){
   const token = req.headers?.authorization?.split(" ")[1];
   if(!token) throw new UnAuthorizedError("You must provide an authorization token.")
   try {
@@ -12,3 +12,5 @@ export function userAuthMiddleWare(req, res, next){
     throw new UnAuthorizedError("Access denied, invalid token.")
   }
 } 
+
+module.exports = userAuthMiddleWare;
