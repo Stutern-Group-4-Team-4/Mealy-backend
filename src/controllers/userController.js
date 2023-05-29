@@ -23,7 +23,7 @@ const Transport = require("nodemailer-sendinblue-transport");
 
 
 const transporter = nodemailer.createTransport(
-    new Transport({ apiKey: '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' })
+    new Transport({ apiKey: apiKey.apiKey })
 );
 
 
