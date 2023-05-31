@@ -1,12 +1,8 @@
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
-const User = require('./User'); // Assuming the user model is in the same directory
+const User = require('.src/model/user.model'); // user model path directory
 
-// Please node you will have to install this package:
-npm install passport passport-facebook mongoose
-
-
-
+// Install passport passport-facebook mongoose
 
 // Facebook authentication configuration
 passport.use(
@@ -28,7 +24,7 @@ passport.use(
         } else {
           // Create a new user with Facebook authentication
           user = new User({
-            name: profile.displayName,
+            name: profile.userName,
             email: profile.emails[0].value,
             facebookAccessToken: accessToken,
             isVerified: true, // Assuming Facebook authentication is trusted
