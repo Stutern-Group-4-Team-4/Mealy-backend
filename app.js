@@ -241,3 +241,53 @@ const start = async () => {
   };
   
   start();
+
+
+
+// User Facebook Verification Section
+const express = require('express');
+const passport = require('passport');
+const session = require('express-session');
+const mongoose = require('mongoose');
+const User = require('./User'); // Assuming the user model is in the same directory
+require('./src/verificationFB'); // Import the socialAuth module
+
+// Configure and connect to MongoDB
+/*mongoose.connect('YOUR_MONGODB_CONNECTION_STRING', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((error) => console.error('MongoDB connection error:', error));
+*/
+// Initialize Express app
+const app = express();
+
+// Configure session middleware
+app.use(session({ secret: 'your_secret_key', resave: true, saveUninitialized: true }));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Define Facebook authentication routes
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+
+app.get(
+  '/auth/facebook/callback',
+  passport.authenticate('facebook', {
+    successRedirect: '/dashboard',
+    failureRedirect: '/login',
+  })
+);
+
+// Example protected route (dashboard)
+app.get('/dashboard', (req, res) => {
+  res.send('You are logged in!');
+});
+
+// Start the server
+app.listen(3000, () => {
+  console.log('Server started on port 3000');
+});
+
