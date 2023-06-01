@@ -11,7 +11,7 @@ const createUserValidator = Joi.object({
   password: Joi.string().regex(/^(?=.*[A-Za-z])(?=.*\d)[a-zA-Z0-9!@#$%^&*()~¥=_+}{":;'?/>.<,`\-\|\[\]]{6,50}$/)
   .required()
   .messages({
-    'string.pattern.base': 'Password must contain at least one number and at least 6 characters long',
+    'string.pattern.base': 'Password must contain one uppercase letter, at least one number and at least 6 characters long',
   }),
   confirmPassword: Joi.string().valid(Joi.ref('password')).required()
 }).strict()
@@ -19,7 +19,7 @@ const createUserValidator = Joi.object({
 
 const loginUserValidator = Joi.object({
   email: Joi.string().required(),
-  password: Joi.string().required
+  password: Joi.string().regex(/^(?=.*[A-Za-z])(?=.*\d)[a-zA-Z0-9!@#$%^&*()~¥=_+}{":;'?/>.<,`\-\|\[\]]{6,50}$/).required()
 }).strict()
 
 const resetPasswordValidator = Joi.object({
@@ -28,8 +28,21 @@ const resetPasswordValidator = Joi.object({
   .messages({
     'string.pattern.base': 'Password must contain one uppercase letter, at least one number and at least 6 characters long'
   }),
-  confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
+  confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({ "any.only": "Passwords have to match" }),
   resetPasswordToken: Joi.string().optional
 }).strict()
 
-module.exports = {createUserValidator, loginUserValidator, resetPasswordValidator};
+const updatePasswordValidator = Joi.object({
+  password: Joi.string().regex(/^(?=.*[A-Za-z])(?=.*\d)[a-zA-Z0-9!@#$%^&*()~¥=_+}{":;'?/>.<,`\-\|\[\]]{6,50}$/)
+  .required()
+  .messages({
+    'string.pattern.base': 'Password must contain one uppercase letter, at least one number and at least 6 characters long'
+  }),
+    
+  confirmPassword: Joi.string()
+    .valid(Joi.ref("password"))
+    .required()
+    .messages({ "any.only": "Passwords have to match" }),
+});
+
+module.exports = {createUserValidator, loginUserValidator, resetPasswordValidator, updatePasswordValidator};

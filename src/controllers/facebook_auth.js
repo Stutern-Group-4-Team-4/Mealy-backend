@@ -1,19 +1,9 @@
-const express = require('express');
-const router = express.Router();
-const session = require('express-session');
-
-
-
-const UserController = require ("../controllers/userController");
-const tryCatchHandler = require("../middlewares/tryCatchHandler");
-
-
 const passport = require('passport');
 const facebookStrategy = require('passport-facebook').Strategy;
-
+const express = require('express');
 const User = require('../model/user');
 
-
+const router = express.Router();
 require('dotenv').config();
 
 passport.use(
@@ -21,12 +11,13 @@ passport.use(
         {
             clientID: process.env.FACEBOOK_CLIENT_ID,
             clientSecret: process.env.FACEBOOK_SECRET_KEY,
-            callbackURL: "http://localhost:3000/facebook/callback",
-            profileFields: ['id', 'displayName']
+            callbackURL: "http://localhost:3000/facebook/callback"
         },
         async function (accessToken, refreshToken, profile, cb){
-            const user = {};
-            done(null, user);
+            const user = await User.findOne({
+                accountId: profile.id,
+                provider: 'facebook'
+            });
             if (!user) {
                 console.log('Adding new Facebook user to DB...');
                 const user = new User({
@@ -44,7 +35,7 @@ passport.use(
     )
 )
 
-router.get('/facebooksignin', passport.authenticate('facebook', {scope: 'email'}));
+router.get('/', passport.authenticate('facebook', {scope: 'email'}));
 
 router.get(
     '/callback',
@@ -78,30 +69,4 @@ router.get('/signout', (req, res)=>{
     }
 });
 
-
-
-
-
-
-// Setting up the User signup/login routes
-router.post("/signup", tryCatchHandler(UserController.createUser))
-router.get("/getotp", tryCatchHandler(UserController.sendVerificationCode) )
-router.get("/resendotp", tryCatchHandler(UserController.resendVerificationCode) )
-router.post('/verify', tryCatchHandler( UserController.verifyUser) )
-router.post("/signin", tryCatchHandler( UserController.loginUser) )
-router.post("/verifyemail", tryCatchHandler( UserController.forgotPassword) )
-router.patch("/resetpassword", tryCatchHandler( UserController.resetPassword) )
-router.patch("/updatepassword", tryCatchHandler( UserController.updatePassword) )
-router.get("/", tryCatchHandler( UserController.findUser) )
-router.get("/users", tryCatchHandler( UserController.findAll) )
-router.delete("/deleteall", tryCatchHandler( UserController.deleteAll) )
-router.delete("/deleteuser/:id", tryCatchHandler( UserController.deleteUser) )
-router.get("/guestlogin", ( UserController.guestUser) )
-router.get("/logout", ( UserController.userLogout) )
-
-
-
-
-
-
-module.exports= router;
+module.exports = router

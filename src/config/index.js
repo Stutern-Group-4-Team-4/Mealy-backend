@@ -1,7 +1,7 @@
 const development = require("./development");
 const production = require("./production");
 require("dotenv").config();
-const Sib = require('sib-api-v3-sdk');
+
 
 const environment = process.env.NODE_ENV;
 

@@ -1,35 +1,24 @@
-const { createUserValidator, loginUserValidator, resetPasswordValidator } = require ("../validators/user.validator.js")
+const { createUserValidator, loginUserValidator, resetPasswordValidator, updatePasswordValidator } = require ("../validators/user.validator.js")
 const { BadUserRequestError, NotFoundError, UnAuthorizedError } = require ("../error/error.js")
 const User = require ("../model/user.js")
 const bcrypt = require ("bcrypt")
 const nodemailer = require("nodemailer")
+const nodemailerSendgrid = require('nodemailer-sendgrid');
 require("dotenv").config();
 const {config} = require ("../config/index.js")
 const crypto = require ("crypto")
-const Sib = require('sib-api-v3-sdk')
 const { FailedRequestError } = require ("../error/error.js")
 const { generateToken } = require ("../utils/jwt.js")
 const jwt = require ("jsonwebtoken")
+const { clearTokenCookie } = require("../utils/jwt");
+
 const cookieParser = require ("cookie-parser")
+const sgMail = require('@sendgrid/mail');
 
-const client = Sib.ApiClient.instance
-
-const apiKey = client.authentications['api-key']
-apiKey.apiKey = process.env.API_KEY;
-
-const transEmailApi = new Sib.TransactionalEmailsApi()
-
-const Transport = require("nodemailer-sendinblue-transport");
-
-
-const transporter = nodemailer.createTransport(
-    new Transport({ apiKey: apiKey.apiKey })
-);
-
-
-
-
-
+const transport = nodemailer.createTransport(
+  nodemailerSendgrid({
+      apiKey: process.env.SENDGRID_API_KEY
+  }));
 
  class UserController {
 
@@ -59,7 +48,7 @@ const transporter = nodemailer.createTransport(
        
       
        // Generate verification token
-       const saltRounds = 10;
+       const saltRounds = process.env.bcrypt_salt_round;
        // Hash verification token/one-time password(otp)
        const verifyEmailToken = Math.floor(100000 + Math.random() * 900000);
 
@@ -109,13 +98,21 @@ const transporter = nodemailer.createTransport(
     //   );
       // Hash verification token/one-time password(otp)
       const verifyEmailToken = Math.floor(100000 + Math.random() * 900000);
-      //send an email revealing otp
-      const mailSent = await transporter.sendMail({
-        from: 'dejioyelakin@gmail.com',
+
+
+     
+     const mailSent = transport.sendMail ({
+        from: 'emmanuelomenaka@gmail.com',
         to: email,
-        subject: 'Mealy OTP verification',
-        text: `Your account verification code is: ${verifyEmailToken}`
-      });
+        subject: 'Mealy OTP Verification',
+        html: `<p>Your account verification code is <strong>${verifyEmailToken}<strong></p>`
+    });
+   
+
+
+
+
+      
       if(mailSent === false) throw new NotFoundError(`${email} cannot be verified. Please provide a valid email address`)
       console.log(mailSent)
       res.status(200).json({
@@ -125,33 +122,41 @@ const transporter = nodemailer.createTransport(
       })
     
   }
+
+
   static async resendVerificationCode(req, res) {
     const {email} = req.query;
   
       // Hash a new verification token/one-time password(otp)
       const newEmailToken = Math.floor(100000 + Math.random() * 900000);
       //send an email revealing new otp
-      const mailSent = await transporter.sendMail({
-        from: 'dejioyelakin@gmail.com',
-        to: email,
-        subject: 'Mealy OTP verification',
-        text: `Your account verification code is: ${newEmailToken}`
-      });
+      
+        const mailSent = transport.sendMail({
+            from: 'emmanuelomenaka@gmail.com',
+            to: email,
+            subject: 'Mealy OTP Verification',
+            text: `Your account verification code is: ${newEmailToken}`,
+            html: `<p>Your account verification code is <strong>${newEmailToken}<strong></p>`
+        });
+        
+    
       const update = { $set: { verifyEmailToken: newEmailToken } };
       const user = await User.updateOne({ email: email }, update);
       if(mailSent === false) throw new NotFoundError(`${email} cannot be verified. Please provide a valid email address`)
       console.log(mailSent)
       res.status(200).json({
         status: 'Success',
-        message: `An email verification link has been sent to ${email}. Your account verification code is: ${verifyEmailToken}`,
+        message: `An email verification link has been sent to ${email}. Your account verification code is: ${newEmailToken}`,
         data: {
-          user
+          user: user
         }
       
         
       })
-    
+  
   }
+ 
+
 
 
   static async verifyUser(req, res) {
@@ -200,110 +205,202 @@ const transporter = nodemailer.createTransport(
   }
 
 
-  static async forgotPassword(req, res ) {
+  static async forgotPassword(req, res ){
     const { email } = req.body;
     // // Confirm  email exists
     const user = await User.findOne({ email })
-    if (!user) throw new UnAuthorizedError("Please provide a valid email address")
+    if (!user) throw new BadUserRequestError("Please provide a valid email address");
+
+
+ 
+  res.status(200).json({
+    status: "Success",
+    message: "User verified successfully",
+    data: {
+      user: user
+    }
+  });
+  
+      
+  
+
+  
+}
+
     // Get reset token
 
-    const getResetPasswordToken=()=> {
-      const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      let token = "";
-      for (let t = 0; t < 10; t++){
-        token += characters.charAt(
-          Math.floor(Math.random()*characters.length)
-        )
-      }
-      return token;
-    }
-    const resetPasswordToken = getResetPasswordToken();
+  //   const getResetPasswordToken=()=> {
+  //     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  //     let token = "";
+  //     for (let t = 0; t < 10; t++){
+  //       token += characters.charAt(
+  //         Math.floor(Math.random()*characters.length)
+  //       )
+  //     }
+  //     return token;
+  //   }
+  //   const resetPasswordToken = getResetPasswordToken();
 
-    const newUser = {
-      resetPasswordToken: resetPasswordToken,
-      resetTokenExpiration: Date.now() + 3600000 //expires in 1 hour
-    }
+  //   const newUser = {
+  //     resetPasswordToken: resetPasswordToken,
+  //     resetTokenExpiration: Date.now() + 3600000 //expires in 1 hour
+  //   }
     
-    await User.updateOne({ email: email }, newUser)
-    await user.save();
+  //   await User.updateOne({ email: email }, newUser)
+  //   await user.save();
 
-    const transporter = nodemailer.createTransport(mailer);
+    
 
-    // create reset URL
-    const resetUrl = `http://mealy-backend.onrender.com/api/v1/user/resetpassword/${resetPasswordToken}`;
+  //   // create reset URL
+  //    const resetUrl = `localhost:3000/api/v1/user/resetpassword/${resetPasswordToken}`;
 
-    const mailOptions = {
-      from: "dejioyelakin@gmail.com",
-      to: email,
-      subject: "Password Reset",
-      text: `
-      You are receiving this email because you requested for a password reset. Please click the following link to reset your password: \n\n ${resetUrl}
-       `,
-    };
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error(error);
-        throw new Error("Error sending reset email");
-      }
-      console.log("Reset email sent:", info.response);
-      res.status(200).json({
-        message: 'A password reset link has been sent to: ${email}',
-        data: {
-          user: user,
-          message: mailOptions,
-        },
-      });
-    });
+    
 
-  }
+    
+  //     const mailOptions = transport.sendMail ({
+  //         from: 'emmanuelomenaka@gmail.com',
+  //         to: email,
+  //         subject: 'Password Reset',
+  //         text: `You are receiving this email because you requested for a password reset. Please click the following link to reset your password: \n\n ${resetUrl}`,
+          
+  //     });
+      
+
+  //     transport.sendMail(mailOptions, (error, info) => {
+  //     if (error) {
+  //       console.error(error);
+  //       throw new Error("Error sending reset email");
+  //     }
+  //     console.log("Reset email sent:", info.response);
+  //     res.status(200).json({
+  //       message: `A password reset link has been sent to: ${email}`,
+  //       data: {
+  //         user: user,
+  //         message: mailOptions,
+  //       },
+  //     });
+  
+  //   });
+  
+  // }
+
+
+ 
 // // Validate the new password
 
   static async resetPassword(req, res,) {
+    const {email} = req.body;
     //Get hashed token
     const resetPasswordToken = crypto
     .createHash('sha256')
     .update(req.params.resetPasswordToken)
     .digest('hex');
+
+    
     // Set Password
     const { error } = resetPasswordValidator.validate(req.body)
     if (error) throw error;
 
-    const {password, confirmPassword} = req.body;
+    
     
     //Find the user by the reset token
     const user = await User.findOne({
+      email: email,
       resetPasswordToken: resetPasswordToken,
       resetPasswordExpire: { $gt: Date.now() }
     })
     if (!user) throw new UnAuthorizedError('Unauthorized')
-    console.log(user)
+    // console.log(user)
     
     //hash password
-    const saltRounds = 10;
-    const hashPassword = bcrypt.hashSync(req.body.password, saltRounds);
+    const saltRounds = process.env.bcrypt_salt_round;
+    user.password = bcrypt.hashSync(req.body.password, saltRounds);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
-    await user.save();
-    //sendTokenResponse(user, 200, res);
+    // await user.save();
+    // create reset URL
+  const resetUrl = `localhost:3000/api/v1/user/resetpassword/${resetPasswordToken}`;
+
+  const message = `<p>You are receiving this email because you requested for a password reset. Please copy and paste the link below in your browser to reset your password:</p> \n\n <a href="${resetUrl}">${resetUrl}</a>`
+  
+  const mailSent = transport.sendMail({
+      from: "emmanuelomenaka@gmail.com",   
+      to:email,
+      subject: 'Password reset',
+      html: message
+    })
+    if(mailSent === false) throw new NotFoundError(`${email} cannot be verified. Please provide a valid email address`)
+      console.log(mailSent)
+      await user.save();
+
     res.status(200).json({
-    status: "Success",
-    message: "Password updated successfully",
-    data: user
-    });
+      status: "Success",
+      message: "A password reset link has been sent.",
+      data: {
+        user: user,
+        message: mailSent,
+      },
+    })
+
+
+    //sendTokenResponse(user, 200, res);
+    // res.status(200).json({
+    // status: "Success",
+    // message: "Password updated successfully",
+    // data: user
+    // });
 
     //update the user's password
-    await User.updateOne(
-      {resetPasswordToken: resetPasswordToken},
-      {
-        password: hashPassword, 
-        confirmPassword: hashPassword
-      }
+    // await User.updateOne(
+    //   {resetPasswordToken: resetPasswordToken},
+    //   {
+    //     password: hashPassword, 
+        
+    //   }
 
-    )
+    // )
+  };
+
+  static async updatePassword(req, res){
+    const token = req.params.token;
+    const { error } = updatePasswordValidator.validate(req.body);
+    if (error) throw error;
+    const { password, confirmPassword } = req.body;
+    // Find the user by the reset token
+    const user = await User.findOne({ resetPasswordToken: token });
+    if (!user) {
+      throw new BadUserRequestError("Invalid or expired reset token");
+    }
+    // Check if the reset token has expired
+    if (user.resetPasswordExpire < Date.now()) {
+      throw new BadUserRequestError("Reset token has expired");
+    }
+    //hash password
+    const saltRounds = process.env.bcrypt_salt_round;
+    const hashedPassword = bcrypt.hashSync(password, saltRounds);
+    const hashedConfirmPassword = bcrypt.hashSync(
+      confirmPassword,
+      saltRounds
+    );
+    // Update the user's password
+    await User.updateOne(
+      { resetPasswordToken: token },
+      {
+        password: hashedPassword,
+        confirmPassword: hashedConfirmPassword,
+        resetPasswordToken: undefined,
+        resetPasswordExpire: undefined,
+      }
+    );
+
+    res.status(200).json({ message: "Password updated successfully" });
+ 
+
   }
 
 
   static async userLogout(req, res,) {
+    clearTokenCookie(res);
     
     res.status(200).json({
     status: "Success",
@@ -365,7 +462,7 @@ const transporter = nodemailer.createTransport(
     if(users.length < 1) throw new NotFoundError('No user found')
     const deleteUsers = await User.deleteMany()
     res.status(200).json({
-      status: "All users delete successfully",
+      status: "All users deleted successfully",
     })
   }
   
