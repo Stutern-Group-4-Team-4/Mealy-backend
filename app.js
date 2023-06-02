@@ -63,8 +63,6 @@ app.get('/send', sendEmail);
 //Password handler
 const bcrypt = require("bcrypt");
 
-// //mongodb user otp verification model
-// const userOTPverification = require("./src/model/userOTPverification");
 
 //mongodb user
 const User = require("./src/model/user.js")
@@ -82,7 +80,7 @@ app.use("/", express.static(path.join(__dirname, "/public")));
 
 //routes
 app.use("/api/v1/user", router);
-// app.use('/auth/google', authRouter);
+app.use('/auth/google', authRouter);
 app.use('/auth/facebook', facebookRouter);
 
 //Global Error Handler

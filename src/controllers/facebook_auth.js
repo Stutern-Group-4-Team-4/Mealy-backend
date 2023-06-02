@@ -11,8 +11,8 @@ const facebookRouter = express.Router();
 passport.use(
     new facebookStrategy(
         {
-            clientID: process.env.FACEBOOK_CLIENT_ID,
-            clientSecret: process.env.FACEBOOK_SECRET_KEY,
+            clientID: '715232830405973',
+            clientSecret: '20b1c39c30b0d83f6bef5f01a4517272',
             callbackURL: "http://localhost:3000/facebook/callback"
         },
         async function (accessToken, refreshToken, profile, cb){
