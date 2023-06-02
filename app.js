@@ -6,6 +6,8 @@ const express = require("express");
 const app = express();
 
 const router = require("./src/router/user.route.js");
+const authRouter = require('./src/controllers/google_auth.js');
+const facebookRouter = require('./src/controllers/facebook_auth.js');
 
 //path for static verified page
 const path = require("path");
@@ -20,8 +22,8 @@ const session = require('express-session')
 
 //Passport
 const passport = require('passport');
-const cookieSession = require('cookie-session');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+// const cookieSession = require('cookie-session');
+// const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
  const sendEmail = require('./src/controllers/userController.js')
 
@@ -61,8 +63,8 @@ app.get('/send', sendEmail);
 //Password handler
 const bcrypt = require("bcrypt");
 
-//mongodb user otp verification model
-const userOTPverification = require("./src/model/userOTPverification");
+// //mongodb user otp verification model
+// const userOTPverification = require("./src/model/userOTPverification");
 
 //mongodb user
 const User = require("./src/model/user.js")
@@ -80,6 +82,8 @@ app.use("/", express.static(path.join(__dirname, "/public")));
 
 //routes
 app.use("/api/v1/user", router);
+app.use('/auth/google', authRouter);
+app.use('/auth/facebook', facebookRouter);
 
 //Global Error Handler
 app.use((err, req, res, next) => {
@@ -89,43 +93,43 @@ app.use((err, req, res, next) => {
   });
 });
 
-passport.use(
-  new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/google/callback"
-  }, (profile, done) => {
+// passport.use(
+//   new GoogleStrategy({
+//     clientID: process.env.GOOGLE_CLIENT_ID,
+//     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+//     callbackURL: "http://localhost:3000/google/callback"
+//   }, (profile, done) => {
 
-    // Check if google profile exist.
-    if (profile.id) {
+//     // Check if google profile exist.
+//     if (profile.id) {
 
-      User.findOne({googleId: profile.id})
-        .then((existingUser) => {
-          if (existingUser) {
-            done(null, existingUser);
-          } else {
-            new User({
-              googleId: profile.id,
-              email: profile.emails[0].value,
-              name: profile.name.familyName + ' ' + profile.name.givenName,
-              pic: req.user.photos[0].value
-            })
-              .save()
-              .then(user => done(null, user));
-          }
-        })
-        app.get('/api/v1/user/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+//       User.findOne({googleId: profile.id})
+//         .then((existingUser) => {
+//           if (existingUser) {
+//             done(null, existingUser);
+//           } else {
+//             new User({
+//               googleId: profile.id,
+//               email: profile.emails[0].value,
+//               name: profile.name.familyName + ' ' + profile.name.givenName,
+//               pic: req.user.photos[0].value
+//             })
+//               .save()
+//               .then(user => done(null, user));
+//           }
+//         })
+//         app.get('/api/v1/user/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-app.get('/api/v1/user/google/callback', 
-    passport.authenticate('google', 
-    {failureRedirect: '/failed'}), 
-    (req, res) => {
-        res.redirect('/successful');
-    })
+// app.get('/api/v1/user/google/callback', 
+//     passport.authenticate('google', 
+//     {failureRedirect: '/failed'}), 
+//     (req, res) => {
+//         res.redirect('/successful');
+//     })
       
-    }
-  })
-);
+//     }
+//   })
+// );
 
 
 
@@ -148,12 +152,12 @@ app.use(passport.initialize());
 //Setting Up Session
 app.use(passport.session());
 
-app.get(
-  '/auth/google',
-  passport.authenticate('google', {
-    scope: ['profile', 'email']
-  })
-);
+// app.get(
+//   '/auth/google',
+//   passport.authenticate('google', {
+//     scope: ['profile', 'email']
+//   })
+// );
         
 //Setting Up The Port
 app.listen(port, () => {

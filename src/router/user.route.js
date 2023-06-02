@@ -10,7 +10,7 @@ const tryCatchHandler = require("../middlewares/tryCatchHandler");
 
 const passport = require('passport');
 const facebookStrategy = require('passport-facebook').Strategy;
-
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../model/user');
 
 
@@ -78,6 +78,44 @@ router.get('/signout', (req, res)=>{
     }
 });
 
+passport.use(
+    new GoogleStrategy({
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/google/callback"
+    }, (profile, done) => {
+  
+      // Check if google profile exist.
+      if (profile.id) {
+  
+        User.findOne({googleId: profile.id})
+          .then((existingUser) => {
+            if (existingUser) {
+              done(null, existingUser);
+            } else {
+              new User({
+                googleId: profile.id,
+                email: profile.emails[0].value,
+                name: profile.name.familyName + ' ' + profile.name.givenName,
+                pic: req.user.photos[0].value
+              })
+                .save()
+                .then(user => done(null, user));
+            }
+          })
+          router.get('/api/v1/user/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+  
+  router.get('/api/v1/user/google/callback', 
+      passport.authenticate('google', 
+      {failureRedirect: '/failed'}), 
+      (req, res) => {
+          res.redirect('/successful');
+      })
+        
+      }
+    })
+  );
+  
 
 
 

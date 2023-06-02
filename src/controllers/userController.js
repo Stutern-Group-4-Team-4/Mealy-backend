@@ -48,7 +48,7 @@ const transport = nodemailer.createTransport(
        
       
        // Generate verification token
-       const saltRounds = process.env.bcrypt_salt_round;
+       const saltRounds = 10;
        // Hash verification token/one-time password(otp)
        const verifyEmailToken = Math.floor(100000 + Math.random() * 900000);
 
@@ -289,7 +289,7 @@ const transport = nodemailer.createTransport(
 // // Validate the new password
 
   static async resetPassword(req, res,) {
-    const {email} = req.body;
+    const {email} = req.query;
     //Get hashed token
     const resetPasswordToken = crypto
     .createHash('sha256')
@@ -313,7 +313,7 @@ const transport = nodemailer.createTransport(
     // console.log(user)
     
     //hash password
-    const saltRounds = process.env.bcrypt_salt_round;
+    const saltRounds = 10;
     user.password = bcrypt.hashSync(req.body.password, saltRounds);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
@@ -336,10 +336,7 @@ const transport = nodemailer.createTransport(
     res.status(200).json({
       status: "Success",
       message: "A password reset link has been sent.",
-      data: {
-        user: user,
-        message: mailSent,
-      },
+      
     })
 
 
