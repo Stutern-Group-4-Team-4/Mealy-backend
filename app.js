@@ -148,7 +148,12 @@ app.use(passport.initialize());
 //   name: ''
 // }))
 //Setting Up Session
-app.use(passport.session());
+app.use(passport.session({
+  secret: 'keyboard warrior',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: true }
+}));
 
 // app.get(
 //   '/auth/google',
