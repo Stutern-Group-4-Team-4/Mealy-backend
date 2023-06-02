@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const session = require('express-session');
+
 
 
 
@@ -8,7 +8,7 @@ const UserController = require ("../controllers/userController");
 const tryCatchHandler = require("../middlewares/tryCatchHandler");
 
 
-const passport = require('passport');
+
 // const facebookStrategy = require('passport-facebook').Strategy;
 // const GoogleStrategy = require('passport-google-oauth20').Strategy;
 // const User = require('../model/user');
