@@ -3,7 +3,7 @@ const facebookStrategy = require('passport-facebook').Strategy;
 const express = require('express');
 const User = require('../model/user');
 
-const router = express.Router();
+const facebookRouter = express.Router();
 require('dotenv').config();
 
 passport.use(
@@ -35,9 +35,9 @@ passport.use(
     )
 )
 
-router.get('/', passport.authenticate('facebook', {scope: 'email'}));
+facebookRouter.get('/', passport.authenticate('facebook', {scope: 'email'}));
 
-router.get(
+facebookRouter.get(
     '/callback',
     passport.authenticate('facebook',{
         failureRedirect: '/auth/facebook/error'
@@ -47,7 +47,7 @@ router.get(
         res.redirect('/auth/facebook/success');
     }
 );
-router.get('/success', async(req,res)=>{
+facebookRouter.get('/success', async(req,res)=>{
     const userInfo = {
         id: req.session.passport.user.id,
         displayName: req.session.passport.user.displayName,
@@ -56,9 +56,9 @@ router.get('/success', async(req,res)=>{
     res.render('fb-github-success', {user: userInfo})
 });
 
-router.get('/error', (req,res)=>res.send('Error logging in via Facebook'));
+facebookRouter.get('/error', (req,res)=>res.send('Error logging in via Facebook'));
 
-router.get('/signout', (req, res)=>{
+facebookRouter.get('/signout', (req, res)=>{
     try{
         req.session.destroy(function(err){
             console.log('session destroyed')
@@ -69,4 +69,4 @@ router.get('/signout', (req, res)=>{
     }
 });
 
-module.exports = router
+module.exports = facebookRouter

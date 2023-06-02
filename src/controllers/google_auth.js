@@ -2,7 +2,7 @@
  const googleStrategy = require('passport-google-oauth').OAuth2Strategy;
  const googleAuth = require('./google-auth-dal');
  const express = require('express');
- const router = express.Router();
+ const authRouter = express.Router();
  require('dotenv').config();
 
  passport.use(
@@ -22,12 +22,12 @@
  );
 
  //request at /auth/google
- router.get(
+ authRouter.get(
     '/',
     passport.authenticate('google', {scope: ['profile', 'email']})
  );
 
- router.get(
+ authRouter.get(
     '/google/callback',
     passport.authenticate('google', {failureRedirect: '/auth/error'},
     (req,res)=>{
@@ -35,16 +35,16 @@
     })
  );
 
- router.get('/success', async(req, res)=>{
+ authRouter.get('/success', async(req, res)=>{
     const{failure,success}= await googleAuth.registerWithGoogle(userProfile);
     if(failure)console.log('Google user already exists in DB..');
     else console.log('Registering new Google user..');
     res.render('success', {user: userProfile})
  });
 
- router.get('/error', (req,res)=>res.send('Error logging in via Google..'));
+ authRouter.get('/error', (req,res)=>res.send('Error logging in via Google..'));
 
- router.get('/google/signout', (req,res)=>{
+ authRouter.get('/google/signout', (req,res)=>{
     try{
         req.session.destroy(function(err){
             console.log('session destroyed.');
@@ -56,4 +56,4 @@
     }
  });
 
- module.exports = router;
+ module.exports = authRouter;
