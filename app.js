@@ -82,7 +82,7 @@ app.use("/", express.static(path.join(__dirname, "/public")));
 
 //routes
 app.use("/api/v1/user", router);
-app.use('/auth/google', authRouter);
+// app.use('/auth/google', authRouter);
 app.use('/auth/facebook', facebookRouter);
 
 //Global Error Handler
