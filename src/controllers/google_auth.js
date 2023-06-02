@@ -1,9 +1,10 @@
- const passport = require('passport');
+require('dotenv').config();
+const passport = require('passport');
  const googleStrategy = require('passport-google-oauth').OAuth2Strategy;
  const googleAuth = require('./google-auth-dal');
  const express = require('express');
  const authRouter = express.Router();
- require('dotenv').config();
+ 
 
  passport.use(
     new googleStrategy(
