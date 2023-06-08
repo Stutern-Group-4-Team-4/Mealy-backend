@@ -14,6 +14,7 @@ const { clearTokenCookie } = require("../utils/jwt");
 
 const cookieParser = require ("cookie-parser")
 const sgMail = require('@sendgrid/mail');
+const Cart = require("../model/Cart.js")
 
 const transport = nodemailer.createTransport(
   nodemailerSendgrid({
@@ -290,36 +291,61 @@ const transport = nodemailer.createTransport(
 
   static async resetPassword(req, res,) {
     const {email} = req.query;
-    //Get hashed token
-    const resetPasswordToken = crypto
-    .createHash('sha256')
-    .update(req.params.resetPasswordToken)
-    .digest('hex');
-
-    
-    // Set Password
-    const { error } = resetPasswordValidator.validate(req.body)
-    if (error) throw error;
-
-    
-    
-    //Find the user by the reset token
     const user = await User.findOne({
       email: email,
-      resetPasswordToken: resetPasswordToken,
-      resetPasswordExpire: { $gt: Date.now() }
-    })
-    if (!user) throw new UnAuthorizedError('Unauthorized')
-    // console.log(user)
+  
+    });
+    //Get hashed token
+    // const resetPasswordToken = crypto
+    // .createHash('shake256')
+    // .update(req.params.resetPasswordToken)
+    // .digest('hex');
+
     
-    //hash password
-    const saltRounds = 10;
-    user.password = bcrypt.hashSync(req.body.password, saltRounds);
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-    // await user.save();
+    // // Set Password
+    // const { error } = resetPasswordValidator.validate(req.body)
+    // if (error) throw error;
+
+    
+    
+    // //Find the user by the reset token
+    // const user = await User.findOne({
+    //   email: email,
+    //   resetPasswordToken: resetPasswordToken,
+    //   resetPasswordExpire: { $gt: Date.now() }
+    // })
+    // if (!user) throw new UnAuthorizedError('Unauthorized')
+    // // console.log(user)
+    
+    // //hash password
+    // const saltRounds = 10;
+    // user.password = bcrypt.hashSync(req.body.password, saltRounds);
+    // user.resetPasswordToken = undefined;
+    // user.resetPasswordExpire = undefined;
+    // // await user.save();
+    const generateResetToken = () => {
+      const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      let token = "";
+      for (let i = 0; i < 12; i++) {
+        token += characters.charAt(
+          Math.floor(Math.random() * characters.length)
+        );
+      }
+      return token;
+    };
+    // Generate a reset token
+    const resetToken = generateResetToken();
+
+    // Set the reset token and its expiration time for the user
+    const newUser = {
+      resetPasswordToken: resetToken,
+      resetPasswordExpire: Date.now() + 3600000, // Token expires in 1 hour
+    };
+
+    await User.updateOne({ email: email }, newUser);
     // create reset URL
-  const resetUrl = `localhost:3000/api/v1/user/resetpassword/${resetPasswordToken}`;
+  const resetUrl = `localhost:3000/api/v1/user/updatepassword/${resetToken}`;
 
   const message = `<p>You are receiving this email because you requested for a password reset. Please copy and paste the link below in your browser to reset your password:</p> \n\n <a href="${resetUrl}">${resetUrl}</a>`
   
@@ -331,11 +357,15 @@ const transport = nodemailer.createTransport(
     })
     if(mailSent === false) throw new NotFoundError(`${email} cannot be verified. Please provide a valid email address`)
       console.log(mailSent)
-      await user.save();
+      // await user.save();
 
     res.status(200).json({
       status: "Success",
       message: "A password reset link has been sent.",
+      data: {
+        user: user,
+        message: mailSent
+      }
       
     })
 
@@ -364,16 +394,16 @@ const transport = nodemailer.createTransport(
     if (error) throw error;
     const { password, confirmPassword } = req.body;
     // Find the user by the reset token
-    const user = await User.findOne({ resetPasswordToken: token });
-    if (!user) {
-      throw new BadUserRequestError("Invalid or expired reset token");
-    }
+    // const user = await User.findOne({ resetPasswordToken: token });
+    // // if (!user) {
+    //   throw new BadUserRequestError("Invalid or expired reset token");
+    // }
     // Check if the reset token has expired
-    if (user.resetPasswordExpire < Date.now()) {
-      throw new BadUserRequestError("Reset token has expired");
-    }
+    // if (user.resetPasswordExpire < Date.now()) {
+    //   throw new BadUserRequestError("Reset token has expired");
+    // }
     //hash password
-    const saltRounds = process.env.bcrypt_salt_round;
+    const saltRounds = 10;
     const hashedPassword = bcrypt.hashSync(password, saltRounds);
     const hashedConfirmPassword = bcrypt.hashSync(
       confirmPassword,
@@ -395,6 +425,7 @@ const transport = nodemailer.createTransport(
 
   }
 
+  
 
   static async userLogout(req, res,) {
     clearTokenCookie(res);
@@ -418,7 +449,7 @@ const transport = nodemailer.createTransport(
     message: "User found successfully",
     status: "Success",
     data:{
-      user
+      user: user
       }
     })
   }

@@ -5,6 +5,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 
+
 const router = require("./src/router/user.route.js");
 const authRouter = require('./src/controllers/google_auth.js');
 const facebookRouter = require('./src/controllers/facebook_auth.js');
@@ -18,25 +19,36 @@ const morgan = require("morgan");
 
 const { config } = require("./src/config/index.js");
 const cookieParser = require("cookie-parser");
-const session = require('express-session')
+const session = require('express-session');
 
 //Passport
 const passport = require('passport');
 // const cookieSession = require('cookie-session');
 
 
- const sendEmail = require('./src/controllers/userController.js')
+ const sendEmail = require('./src/controllers/userController.js');
 
+ const Dishes = require('./src/model/Dishes.js');
+ const continentalDishes = require('./src/model/ContinentalDishes.js');
+ const localDishes = require('./src/model/localDishes.js');
+ const {allDishes} = require('./src/seed/seeder.alldishes.js');
+ const {continentalDishes} = require('./src/seed/seeder.continental.js');
+ const {localDishes} = require('./src/seed/seeder.locdish.js');
 
 
 
 // Database connection
 mongoose
   .connect(
-    process.env.mongodb_connection_url
+    'mongodb+srv://dejioyelakin:Possibility2+@cluster0.vccc0w4.mongodb.net/MEALY?retryWrites=true&w=majority'
   )
   .then(() => console.log("Database connection established"))
   .catch((e) => console.log("Mongo connection error: ", e.message));
+
+  //Add seeded data one time to db
+  Dishes.insertMany(allDishes);
+  continentalDishes.insertMany(continentalDishes);
+  localDishes.insertMany(localDishes);
 
 //PORT
 const port = process.env.PORT || 3000;
@@ -112,6 +124,8 @@ passport.deserializeUser((id, done) => {
 app.use("/api/v1/user", router);
 app.use('/auth/google', authRouter);
 app.use('/auth/facebook', facebookRouter);
+
+
 
 
 

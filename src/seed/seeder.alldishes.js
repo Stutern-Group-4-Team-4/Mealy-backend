@@ -1,0 +1,124 @@
+ const allDishes = [
+    {
+        title: "Beef Burger",
+        item: "all dishes",
+        description: "A beef burger is a delicious and satisfying meal that you can enjoy anytime. It consists of a juicy patty of ground beef, usually seasoned with salt, pepper, and other spices, cooked on a grill or a skillet, and served on a soft bun. You can customize your beef burger with various toppings, such as cheese, lettuce, tomato, onion, pickles, bacon, or sauces. A beef burger is also known as a hamburger or simply a burger, and it is one of the most popular foods in the world. Whether you make it at home or order it from a restaurant, a beef burger is always a good choice for a hearty and tasty dish.",
+        price: 1500,
+        image: "https://cdn.pixabay.com/photo/2021/01/19/08/46/sandwich-5930489_640.jpg"
+    },
+      {
+        title: "Wings",
+        item: "all dishes",
+        description: "If you love chicken, you'll love chicken wings! They are one of the most delicious parts of the chicken, full of juicy dark meat and crispy skin.",
+        price: 1500,
+        image: "https://www.wholesomeyum.com/wp-content/uploads/2022/12/wholesomeyum-Baked-Whole-Chicken-Wings-15.jpg"
+    },
+      {
+        title: "Shawarma",
+        item: "all dishes",
+        description: "Shawarma is a great option for a quick and satisfying meal that you can enjoy anytime! It consists of thin slices of meat, usually lamb, chicken, or beef, that are marinated in spices and roasted on a vertical spit. The meat is then shaved off and served in a flatbread, such as pita or laffa, with various toppings and sauces. Some common toppings are tomatoes, onions, pickles, lettuce, and fries.",
+        price: 1500,
+        image: "https://media.istockphoto.com/id/888366454/photo/chicken-wrap.jpg?s=612x612&w=0&k=20&c=smy2oTsWnDDDEaS_Rkn6Jj-7KXll4FlO_aYR9BoKcu0="
+    },
+    {
+        title: "Pancakes",
+        item: "all dishes",
+        description: "A pancake is a delicious and versatile treat that you can enjoy for breakfast, lunch, or dinner. It is a type of flatbread that is made from a simple batter of flour, eggs, milk, and sometimes butter or oil. You can cook it on a hot griddle or frying pan until it is golden and fluffy on both sides. You can also add different ingredients to the batter, such as blueberries, chocolate chips, or cheese, to make your pancakes more exciting. There are many ways to serve pancakes, depending on your preference and mood. You can drizzle them with maple syrup, honey, or jam, or squeeze some lemon juice and sprinkle some sugar on top. You can also roll them up with sweet or savory fillings, such as fruit, cream, ham, or cheese. Pancakes are fun to make and eat, and they are perfect for any occasion.",
+        price: 1500,
+        image: "https://www.delscookingtwist.com/wp-content/uploads/2022/01/Easy-Fluffy-American-Pancakes_1.jpg"
+    },
+      {
+        title: "Stir Fried Spaghetti",
+        item: "all dishes",
+        description: "Stir fried spaghetti is a delicious and easy dish that you can make in no time. It's a great way to use up leftover pasta and veggies, or you can customize it with your favorite ingredients. All you need is some cooked spaghetti, oil, garlic, soy sauce, and whatever else you like. Just heat up a large skillet over high heat, add some oil and garlic, and toss in the spaghetti. Stir fry for a few minutes until the noodles are hot and slightly crisp. Then add some soy sauce and any other seasonings you want. You can also add some cooked meat, eggs, cheese, or nuts for extra protein and flavor. Stir fry until everything is well combined and heated through. Enjoy your stir fried spaghetti with some salad or bread for a satisfying meal!",
+        price: 1500,
+        image: "https://msshiandmrhe.com/wp-content/uploads/2022/09/WeChat-Image_20220912212925.jpg"
+    },
+      {
+        title: "Fried Chips",
+        item: "all dishes",
+        description: "If you love potatoes, you will adore fried chips! They are a delicious snack or side dish made from deep-frying slices of potatoes until they are crispy and golden. You can cut them into different shapes and sizes, from thin and long to thick and chunky. Fried chips are also known as french fries, finger chips, or pommes frites in different parts of the world. You can enjoy them with salt, vinegar, ketchup, mayonnaise, or any other sauce you like. Fried chips are so easy to make and so satisfying to eat!",
+        price: 1500,
+        image: "https://images.immediate.co.uk/production/volatile/sites/30/2020/12/Web-Air-Fryer-Chips-305f379.jpg"
+    },
+    {
+        title: "Ogbono Soup",
+        item: "all dishes",
+        description: "The soup is also known for its slimy nature and is locally called draw soup in Nigeria. It is eaten in virtually all places in Nigeria although very common in the south-west and south-eastern region. Ogbono soup is made from ground ogbono seed(African mango seeds), red palm oil, onions, stock, seasoning cubes, assorted meat such as beef, sea food such as shrimp, and crayfish as well as leafy vegetables such as spinach, pumpkin.",
+        price: 1500,
+        image: "https://th.bing.com/th/id/R.ecd707b226f919509fc3e998badbb7ee?rik=wC2%2b%2fP2geXFB%2bw&pid=ImgRaw&r=0"
+    },
+      {
+        title: "Amala",
+        item: "all dishes",
+        description: "Amala is a very important food in Nigeria especially among the Yorubas,  This popular delicacy is made from yam or cassava flour. It is a popular side dish served with ewédú and gbẹ̀gìrì (black-eyed beans soup), but is also served with a variety of other ọbè(soups), such as ẹ̀fọ́, ilá, and ogbono.",
+        price: 1500,
+        image: "https://9jafoods.com/wp-content/uploads/2019/08/amala-and-ewedu-2.jpg"
+    },
+      {
+        title: "Moi moi",
+        item: "all dishes",
+        description: "Moi moi is a traditional Nigerian food made with steamed ground beans and enriched with spices. Moi Moi (Moin Moin) is usually eaten alone as a meal , but most times it is served with other Nigerian foods such as  Pap(Ogi or Akamu), Fried rice, Boiled white rice and stew, Jollof Rice and a lot more.",
+        price: 1500,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMLcFC7RTexgDBJpFw4J2NQCtk4YurG-KIqQ&usqp=CAU"
+    },
+    {
+        title: "Asun",
+        item: "all dishes",
+        description: "Peppered Goat Meat, commonly known as Asun in Nigeria, is a finger-licking, lip-smacking combination of roasted goat meat sautéed in spicy habanero and red bell peppers, that is so delicious, you'll almost be tempted to eat it all in one sitting!",
+        price: 1500,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJl4ui7nPaL5j3GT1CB_zEN95-G-564pHswQ&usqp=CAU"
+    },
+      {
+        title: "Banga Soup",
+        item: "all dishes",
+        description: "Banga soup is one of the best nourishing soups you can make with palm nuts. All it takes is an assortment of spice flavorings, an assortment of meat and fish, and finishing it off with a touch of ”beletete” to elevate this soup. It’s an easy recipe that delivers terrific results! Banga is also popularly known as Palm nut soup, and it’s not only popular in Nigeria, but it’s also a delicacy in Ghana and Cameroon. Banga soup is used to accompany other dishes such as fufu, banku, eba(made with Garri), pounded yam, rice, boiled plantains, etc.",
+        price: 1500,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYu4C42UPiQHZ5iKjAXc31svphKOQVPoH3PfQAm6jyj_eO4MSNX1ytTGXVOprEkAuJPoI&usqp=CAU"
+    },
+      {
+        title: "Afang Soup",
+        item: "all dishes",
+        description: "Afang soup is a vegetable soup that originates from the Efik people of the Efik kingdom in Cross River State and the Ibibio People of Akwa Ibom in Southern Nigeria. It is a dish popularly known by Nigerians and also some parts of Africa. The soup consists mainly of vegetables, including water leaves and the wild herbal Okazi leaves. It is a delicious stew made with Afang leaves and a leafy vegetable called waterleaf or malabar spinach3.",
+        price: 1500,
+        image: "https://allnigerianfoods.com/wp-content/uploads/Afang-soup-Recipe.jpg"
+    },
+      {
+        title: "Jollof Rice",
+        item: "all dishes",
+        description: "Jollof rice is a delicious dish that originated in West Africa and has spread to many other parts of the world. It is made with rice, tomatoes, onions, spices, and sometimes meat or fish. Jollof rice is cooked in one pot, which gives it a rich and flavorful taste. Jollof rice is often served with salad, fried plantains, or other side dishes. Jollof rice is a great meal for any occasion, whether it's a family dinner, a party, or a picnic. Jollof rice is easy to make and can be customized to your preferences. Jollof rice is more than just food, it's a culture and a tradition that brings people together.",
+        price: 1500,
+        image: "https://www.simplyrecipes.com/thmb/-paU2Zi1V6rpSWmh8bta9Ajd2WE=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Simply-Recipes-Jollof-Rice-LEAD-6-5a93db14a0ac461f88dc557514a770c0.jpg"
+    },
+      {
+        title: "Noodles",
+        item: "all dishes",
+        description: "Noodles are a delicious and versatile food that can be enjoyed in many ways. They are made from **unleavened dough** that is rolled, stretched, or extruded into different shapes and sizes. Noodles can be made from various ingredients, such as **wheat flour**, **rice flour**, **egg**, or **starch** . Noodles are usually cooked in boiling water with salt or oil, but they can also be fried, baked, or added to soups and sauces . Noodles are a staple food in many cultures, especially in Asia and Europe, where they have a long history and tradition . Noodles are not only tasty, but also nutritious, as they provide carbohydrates, protein, fiber, and minerals.",
+        price: 1500,
+        image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjavi3EFK4jUdhbzDIcXQKlicM5GKak_m5ujQbUtmXD1TasXv6GAO_f-6wUcBu9-IEhJ_FwB2pSSFLjhTVpuX278FQAEduvuNm5FiNPSik-yATL09OwAxza_Q0QNecAah0g--uIuyBK09uaQ2fpni8HK59-uFLdfgKEMsHU4K5FtiUoMbOs4cRfb9Ci/s4032/how%20to%20make%20instant%20noodles%20sisiyemmie.JPG"
+    },
+      {
+        title: "Pasta",
+        item: "all dishes",
+        description: "Pasta is a delicious and versatile food that originated in Italy. It is made from **unleavened dough** of wheat flour mixed with water or eggs, and then shaped into different forms, such as tubes, ribbons, shells, or spirals. Pasta can be cooked by boiling or baking, and served with various sauces, cheeses, meats, vegetables, or herbs. Pasta is a good source of carbohydrates, protein, and fiber, and can be enriched with vitamins and minerals. Some types of pasta are also gluten-free, made from rice flour or legumes  . Pasta is one of the most popular dishes in the world, and there are hundreds of different shapes and names for it. Some of the common ones are spaghetti, macaroni, lasagna, linguini, and tortellini. Pasta can be enjoyed hot or cold, as a main course or a side dish, or even as a salad or a soup. Pasta is easy to make at home, or you can buy it ready-made from the store. No matter how you like it, pasta is always a satisfying and tasty meal!",
+        price: 1500,
+        image: "https://images.immediate.co.uk/production/volatile/sites/30/2013/05/Puttanesca-fd5810c.jpg?quality=90&resize=556,505"
+    },
+      {
+        title: "Seafood",
+        item: "all dishes",
+        description: "Seafood is a delicious and nutritious type of food that comes from the sea. Seafood includes fish, shellfish, crustaceans, seaweed and more. Seafood is rich in protein, omega-3 fatty acids, vitamins and minerals that are good for your health. Seafood is also very versatile and can be cooked in many different ways, such as grilled, fried, baked, steamed or raw. Seafood is a great choice for any meal, whether you want a light salad, a hearty soup, a spicy curry or a fancy sushi. Seafood is one of the best things you can eat!",
+        price: 1500,
+        image: "https://www.dinneratthezoo.com/wp-content/uploads/2019/06/seafood-pasta-5.jpg"
+    },
+      {
+        title: "Dessert",
+        item: "all dishes",
+        description: "Dessert is a delicious way to end a meal. It is a course that consists of **sweet foods**, such as **cake**, **ice cream**, **pudding**, or **fruit**. Dessert can also include a drink, such as **dessert wine** or **liqueur**. Dessert is popular in many parts of the world, but not everywhere. Some cultures have different traditions for finishing a meal. Dessert is a treat that makes people happy and satisfied. Dessert is awesome!",
+        price: 1500,
+        image: "https://www.seriouseats.com/thmb/UBNgLLdqu99xbK2y9hq7BMDZsTM=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/__opt__aboutcom__coeus__resources__content_migration__serious_eats__seriouseats.com__2018__06__20180626-semifreddo-vicky-wasik-12-349eb45f52654ce588403bd0fbcbfce1.jpg"
+    }
+
+]
+
+module.exports = allDishes;

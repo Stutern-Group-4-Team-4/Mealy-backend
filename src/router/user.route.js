@@ -5,6 +5,7 @@ const router = express.Router();
 
 
 const UserController = require ("../controllers/userController");
+const productController = require("../controllers/productController");
 const tryCatchHandler = require("../middlewares/tryCatchHandler");
 
 
@@ -129,13 +130,29 @@ router.post('/verify', tryCatchHandler( UserController.verifyUser) )
 router.post("/signin", tryCatchHandler( UserController.loginUser) )
 router.post("/verifyemail", tryCatchHandler( UserController.forgotPassword) )
 router.patch("/resetpassword", tryCatchHandler( UserController.resetPassword) )
-router.patch("/updatepassword", tryCatchHandler( UserController.updatePassword) )
+router.patch("/updatepassword/:token", tryCatchHandler( UserController.updatePassword) )
 router.get("/", tryCatchHandler( UserController.findUser) )
 router.get("/users", tryCatchHandler( UserController.findAll) )
 router.delete("/deleteall", tryCatchHandler( UserController.deleteAll) )
 router.delete("/deleteuser/:id", tryCatchHandler( UserController.deleteUser) )
 router.get("/guestlogin", ( UserController.guestUser) )
 router.get("/logout", ( UserController.userLogout) )
+
+//Setting up routes for adding, updating Carts
+router.get("/search", productController.searchProduct)
+router.get('/alldishes', tryCatchHandler(productController.allDishes));
+router.get('/specificdish/:id', tryCatchHandler(productController.specificDish));
+router.get('/localdishes', tryCatchHandler(productController.localDishes));
+router.get('/locdish/:id', tryCatchHandler(productController.locDish));
+router.get('/contdishes', tryCatchHandler(productController.continentalDishes));
+router.get('/contdish/:id', tryCatchHandler(productController.continentalDish));
+router.post('/add_cart', tryCatchHandler(productController.addCart));
+router.post('/update_cart', tryCatchHandler(productController.updateCart));
+router.get('/fetch_cart', tryCatchHandler(productController.fetchCart));
+router.get('/fetch_address', tryCatchHandler(productController.fetchAddress));
+router.post('/add_address', tryCatchHandler(productController.addAddress));
+router.delete("/:productId", productController.deleteItem);
+router.post("/:id/review",productController.productReview)
 
 
 
