@@ -1,11 +1,12 @@
 const mongoose = require("mongoose")
 const validator = require("validator")
-const crypto = require ("crypto");
+
 
 const userSchema = new mongoose.Schema({
     name: {
       type: String,
       required: true,
+      trim: true,
       min: 3,
       max: 100
     },
@@ -19,6 +20,7 @@ const userSchema = new mongoose.Schema({
     email: {
       type: String,
       required: true,
+      trim: true,
       unique: true,
       lowercase: true,
       immutable: true,
@@ -38,6 +40,29 @@ const userSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    role: {
+      type: String,
+      trim: true,
+      enum: ["user", "admin"],
+      default: "user"
+ },
+ address: {
+  type: String
+},
+ cart: [
+  {
+      type: Schema.Types.ObjectId,
+      ref: "Cart"
+  }
+],
+
+order: [
+  {
+      type: Schema.Types.ObjectId,
+      ref: "Order"
+  },
+],
+
     verifyEmailToken: String,
     verifyEmailTokenExpire: Date,
     resetPasswordToken: String,
@@ -50,30 +75,8 @@ const userSchema = new mongoose.Schema({
  }  
   )
 
-  
-  
-  
-
-
-  userSchema.methods.getResetPasswordToken = function () {
-    // Generate Token
-    const resetToken = crypto.randomBytes(20).toString('hex');
-    // Hash token and set to resetPasswordToken field
-    this.resetPasswordToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
-  
-    // Set expire
-    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
-    return resetToken
-
-  }
-
-  const User = mongoose.model("User", userSchema);
-  
-  
-  module.exports =  User;
+  const User = mongoose.model('Users', userSchema)
+  module.exports = User
 
   
 

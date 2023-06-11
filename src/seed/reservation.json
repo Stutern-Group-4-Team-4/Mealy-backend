@@ -1,0 +1,16 @@
+
+    {
+      "tables": {
+        "name": "Emmy",
+        "capacity": 3,
+        "isAvailable": true,
+        "location": "Plot 3B, Block A10, Admiralty Way, Lekki Phase 1, Lagos"
+      },
+      "reservation": {
+        "name": "Emmy",
+        "phoneno": "07059944977",
+        "email": "emmyoyelaks@gmail.com"
+      },
+      "date": "2023-08-23T18:25:43.511Z"
+    }
+  

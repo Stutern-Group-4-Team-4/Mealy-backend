@@ -3,10 +3,10 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 const locDishes= new Schema({
    
-    title: {
+    name: {
         type: String
     },
-    item: {
+   category: {
         type: String
     },
     rating:{

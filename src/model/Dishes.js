@@ -2,44 +2,13 @@ const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema;
 
-const restaurantSchema = new Schema({
-    restaurant: {
-        type: String,
-        required: [true, 'Please provide a name']
-    },
-    food: [{
-        name: {
-            type: String,
-            required: true
-        },
-        price: {
-            type: Number,
-            required: true
-        }
-    }],
-    drink: [{
-        name: {
-            type: String,
-            required: true
-        },
-        price: {
-            type: Number,
-            required: true
-        }
-    }],
-    imageUrl: {
-        type: [String],
-        required: true,
-    },
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: [true, 'Please provide a name'],
-        ref: "User"
-    }
-});
+
 
 const Dish= new Schema({
-    name:[restaurantSchema],
+    name:{
+        type: String,
+        required: true
+    },
     reviews: [{
         name:{
             type: String,
@@ -66,13 +35,19 @@ const Dish= new Schema({
         type: Number,
         default: 0
     },
-    item: {
-        type: String
-    },
     rating:{
         type: String,
         required:false,
         default:'4.0'
+    },
+    available: {
+        type: Boolean,
+        default: false
+    },
+
+    category: {
+        type: String,
+        required: true
     },
    
     description: {
@@ -83,7 +58,6 @@ const Dish= new Schema({
     },
     image: {
         type: String,
-        required: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,

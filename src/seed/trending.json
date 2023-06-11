@@ -1,0 +1,25 @@
+
+[{
+    "title": "Potato Salad",
+    "orders": 250,
+    "views": 500,
+    "popularity": 325,
+    "category": "continental dishes",
+    "description": "A lovely meal",
+    "price": 2500,
+    "available": true,
+    "image":
+      "https://sweetandsavorymeals.com/wp-content/uploads/2019/05/creamy-potato-salad-facebook.jpg"
+  },
+{
+    "title": "Spag Bolognese",
+    "orders": 50,
+    "views": 200,
+    "popularity": 191,
+    "category": "continental dishes",
+    "description": "A delicious meal",
+    "price": 2500,
+    "available": true,
+    "image":
+      "https://th.bing.com/th/id/R.e72b5cf4f223cc63d8d690466c5c6677?rik=9T0VhlWAv0zXOQ&riu=http%3a%2f%2fwww.archanaskitchen.com%2fimages%2farchanaskitchen%2fWorld_Pastas_Pizzas%2fThe_Best_Spicy_Spaghetti_Bolognese_Recipe-1.jpg&ehk=r5fSh9rVNOfPDrz4tcO%2bJH4MVD%2fWFGsEolisZV3jbhE%3d&risl=&pid=ImgRaw&r=0"
+  }]

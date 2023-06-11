@@ -1,0 +1,31 @@
+[
+    {
+        "name": "Maltina",
+        "category": "Soda",
+        "description": "So refreshing!",
+        "price": 700,
+        "image": "https://orljaa.com/wp-content/uploads/2020/06/maltina-can-33cl-1.png"
+    },
+    {
+        "name": "Moet & Chandon",
+        "category": "Wine",
+        "description": "So refreshing!",
+        "price": 4000,
+        "image": "https://cdn.webshopapp.com/shops/307838/files/343820928/moet-chandon-imperial-brut-75cl-gift-box.jpg"
+    },
+    {
+        "name": "Chi Exotic",
+        "category": "Juice",
+        "description": "So refreshing!",
+        "price": 900,
+        "image": "https://vetplanets.com/ng/wp-content/uploads/sites/2/2021/06/1623841403_prdts_exotic_multi-1.jpg"
+    },
+    {
+        "name": "Budweiser",
+        "category": "Beer",
+        "description": "So refreshing!",
+        "price": 1200,
+        "image": "https://cbsnews1.cbsistatic.com/hub/i/2013/02/26/722bd2b0-1c4c-11e3-9918-005056850598/budweiser_81555632.jpg"
+    }
+    
+]

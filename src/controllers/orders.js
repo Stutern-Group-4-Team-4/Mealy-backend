@@ -1,0 +1,81 @@
+const User = require("../model/user")
+const Dishes = require("../model/Dishes")
+const Order = require("../model/orders")
+const Cart = require("../model/userCart")
+
+
+class order {
+    static async checkout(req, res, next) {
+        try {
+            const userId = req.params.id;
+            const itemsToCheckout = req.body.items
+            const itemsToCheckoutSplit = itemsToCheckout.split(",")
+
+            let totalPrice = 0
+            let itemSummary = []
+            for (let eachItemInUserCart = 0; eachItemInUserCart < itemsToCheckoutSplit.length; eachItemInUserCart ++) {
+                const eachId = itemsToCheckoutSplit[eachItemInUserCart]
+
+                const detailsOfItemFromCart = await Cart.findById(eachId)
+                if (detailsOfItemFromCart == null) return res.status(200).json("looks like there is no user with that cart or cart is empty")
+                if (detailsOfItemFromCart.userId.toString() === userId._id.toString()) {
+                    const oneFood = await Dishes.findById(detailsOfItemFromCart.foodId)
+                    const oneFoodPrice = oneFood.price
+                    const foodItemQyt = detailsOfItemFromCart.qty
+                    const thisFoodItemPriceWithQty = (oneFoodPrice * foodItemQyt)
+                    totalPrice += thisFoodItemPriceWithQty
+                    const jsonOfSummary = {
+                        foodName: oneFood.name,
+                        foodId: oneFood._id,
+                        foodQyt: foodItemQyt,
+                        eachFoodPrice: oneFoodPrice,
+                        oneFoodPriceWithQyt: thisFoodItemPriceWithQty
+                    }
+                    itemSummary.push(jsonOfSummary)
+                }           
+            }
+            const userAddress = userId.address
+            const userPhone = userId.phoneno
+
+            if (userAddress == null || userAddress == undefined 
+                || userPhone == null || userPhone == undefined) {
+                return res.status(501).json("this checkout can't be implemented, please update your profile to have the address and phone number")
+            }
+
+            await new Order({
+                orderId: userId._id,
+                items: itemSummary,
+                address: userAddress,
+                phone: userPhone,
+                totalAmount: totalPrice,
+                orderDate: Date.now(),
+                paidThrough: "card"
+            }).save()
+            
+            let toDelete = []
+            for (let eachItemInUserCart = 0; eachItemInUserCart < itemsToCheckoutSplit.length; eachItemInUserCart ++) {
+                toDelete.push(itemsToCheckoutSplit[eachItemInUserCart])
+            }
+            await Cart.deleteMany({_id: {$in: toDelete}})
+
+            return await res.status(201).json({
+                address: userAddress,
+                phone: userPhone,
+                itemSummary: itemSummary,
+                totalPrice: totalPrice
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    static async orderHistory(req, res, next) {
+        const userId = req.params.id
+        const allUserOrder = await Order.find({
+            orderId: userId._id
+        })
+        return res.status(200).json(allUserOrder)
+    }
+}
+
+module.exports = order

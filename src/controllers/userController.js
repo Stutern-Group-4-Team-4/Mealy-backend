@@ -5,6 +5,8 @@ const bcrypt = require ("bcrypt")
 const nodemailer = require("nodemailer")
 const nodemailerSendgrid = require('nodemailer-sendgrid');
 require("dotenv").config();
+const Token = require("../model/token_model.js")
+const passwordMiddleware = require("../middlewares/passwordHash-middleware.js")
 const {config} = require ("../config/index.js")
 const crypto = require ("crypto")
 const { FailedRequestError } = require ("../error/error.js")
@@ -14,7 +16,7 @@ const { clearTokenCookie } = require("../utils/jwt");
 
 const cookieParser = require ("cookie-parser")
 const sgMail = require('@sendgrid/mail');
-const Cart = require("../model/Cart.js")
+
 
 const transport = nodemailer.createTransport(
   nodemailerSendgrid({
@@ -288,105 +290,106 @@ const transport = nodemailer.createTransport(
 
  
 // // Validate the new password
+static async requestPasswordReset(req, res, next) {
+  try {
+      let email = req.body.email
+      let phoneno = req.body.phoneno
+      const user = await User.findOne({email: email},{phoneno: phoneno})
+
+      if (!user) {
+          const err = new Error()
+          err.name = "Authentication Error"
+          err.status = 401
+          err.message = "This user doesn't exist"
+          throw err
+      }
+
+      let token = await Token.findOne({ userId: user._id })
+      if (token) await token.deleteOne()
+
+      let resetPasswordToken = crypto.randomBytes(32).toString("hex")
+      const hash = passwordMiddleware.hashPassword( resetPasswordToken )
+      
+      await new Token({
+          userId: user._id,
+          token: hash,
+          createdAt: Date.now()
+      }).save()
+
+      const link = `http://localhost:3000/api/v1/user/resetpassword?userId=${user._id}&resetToken=${resetPasswordToken}`
+      
+      const mailSent = transport.sendMail({
+          from: "emmanuelomenaka@gmail.com",   
+          to:email,
+          subject: 'Password reset',
+          html: `<p>You are receiving this email because you requested for a password reset. Please copy and paste the link below in your browser to reset your password:</p> \n\n <a href="${link}">${link}</a>`
+        })
+        if(mailSent === false) throw new NotFoundError(`${email} cannot be verified. Please provide a valid email address`)
+          console.log(mailSent)
+          // await user.save();
+    
+        res.status(200).json({
+          status: "Success",
+          message: "A password reset link has been sent.",
+          data: {
+            user: user,
+            message: mailSent
+          }
+          
+        })
+} catch (error) {
+  next(error)
+}}
+
 
   static async resetPassword(req, res,) {
-    const {email} = req.query;
-    const user = await User.findOne({
-      email: email,
-  
-    });
-    //Get hashed token
-    // const resetPasswordToken = crypto
-    // .createHash('shake256')
-    // .update(req.params.resetPasswordToken)
-    // .digest('hex');
+    try {
+      const { userId, resetPasswordToken } = req.query
+      const { password } = req.body
 
-    
-    // // Set Password
-    // const { error } = resetPasswordValidator.validate(req.body)
-    // if (error) throw error;
+      let user = await Token.findOne({ userId: userId })
 
-    
-    
-    // //Find the user by the reset token
-    // const user = await User.findOne({
-    //   email: email,
-    //   resetPasswordToken: resetPasswordToken,
-    //   resetPasswordExpire: { $gt: Date.now() }
-    // })
-    // if (!user) throw new UnAuthorizedError('Unauthorized')
-    // // console.log(user)
-    
-    // //hash password
-    // const saltRounds = 10;
-    // user.password = bcrypt.hashSync(req.body.password, saltRounds);
-    // user.resetPasswordToken = undefined;
-    // user.resetPasswordExpire = undefined;
-    // // await user.save();
-    const generateResetToken = () => {
-      const characters =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      let token = "";
-      for (let i = 0; i < 12; i++) {
-        token += characters.charAt(
-          Math.floor(Math.random() * characters.length)
-        );
+      if (!user) {
+          const err = new Error()
+          err.name = "Authentication Error"
+          err.status = 401
+          err.message = "Invalid or expired password reset token"
+          throw err
       }
-      return token;
-    };
-    // Generate a reset token
-    const resetToken = generateResetToken();
 
-    // Set the reset token and its expiration time for the user
-    const newUser = {
-      resetPasswordToken: resetToken,
-      resetPasswordExpire: Date.now() + 3600000, // Token expires in 1 hour
-    };
+      const isValid = passwordMiddleware.compareHash(resetPasswordToken, user.token)
 
-    await User.updateOne({ email: email }, newUser);
-    // create reset URL
-  const resetUrl = `localhost:3000/api/v1/user/updatepassword/${resetToken}`;
-
-  const message = `<p>You are receiving this email because you requested for a password reset. Please copy and paste the link below in your browser to reset your password:</p> \n\n <a href="${resetUrl}">${resetUrl}</a>`
-  
-  const mailSent = transport.sendMail({
-      from: "emmanuelomenaka@gmail.com",   
-      to:email,
-      subject: 'Password reset',
-      html: message
-    })
-    if(mailSent === false) throw new NotFoundError(`${email} cannot be verified. Please provide a valid email address`)
-      console.log(mailSent)
-      // await user.save();
-
-    res.status(200).json({
-      status: "Success",
-      message: "A password reset link has been sent.",
-      data: {
-        user: user,
-        message: mailSent
+      if (!isValid) {
+          const err = new Error()
+          err.name = "Authentication Error"
+          err.status = 401
+          err.message = "Invalid or expired password reset token"
+          throw err
       }
-      
-    })
 
+      const hash = passwordMiddleware.hashPassword( password )
 
-    //sendTokenResponse(user, 200, res);
-    // res.status(200).json({
-    // status: "Success",
-    // message: "Password updated successfully",
-    // data: user
-    // });
+      await User.updateOne(
+          {_id: userId},
+          { $set: { password: hash } },
+          { new: true }
+      )
 
-    //update the user's password
-    // await User.updateOne(
-    //   {resetPasswordToken: resetPasswordToken},
-    //   {
-    //     password: hashPassword, 
-        
-    //   }
+      await user.deleteOne()
 
-    // )
-  };
+      return await res.json({
+          message: "password reset successful",
+          status: 201
+      })
+  } catch (error) {
+      next(error)
+  }
+}
+  
+  static async userProfile(req, res, next) {
+    const user = req.user
+    res.json(user)
+}
 
   static async updatePassword(req, res){
     const token = req.params.token;
@@ -405,16 +408,13 @@ const transport = nodemailer.createTransport(
     //hash password
     const saltRounds = 10;
     const hashedPassword = bcrypt.hashSync(password, saltRounds);
-    const hashedConfirmPassword = bcrypt.hashSync(
-      confirmPassword,
-      saltRounds
-    );
+   ;
     // Update the user's password
     await User.updateOne(
       { resetPasswordToken: token },
       {
         password: hashedPassword,
-        confirmPassword: hashedConfirmPassword,
+        confirmPassword: hashedPassword,
         resetPasswordToken: undefined,
         resetPasswordExpire: undefined,
       }
@@ -491,6 +491,7 @@ const transport = nodemailer.createTransport(
     const deleteUsers = await User.deleteMany()
     res.status(200).json({
       status: "All users deleted successfully",
+      data: deleteUsers
     })
   }
   

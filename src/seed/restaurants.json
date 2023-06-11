@@ -1,0 +1,23 @@
+[
+  {
+    "name": "KFC",
+    "address": "J.K. Randle Rd, Lagos, Nigeria.",
+    "description": "It's finger-lickin' good!",
+    "contactNumber": "070980209520",
+    "image": "https://proengconstrutora.com.br/wp-content/uploads/2021/02/WhatsApp-Image-2020-07-16-at-19.48.18-1.jpeg"
+  },
+  {
+    "name": "The Place",
+    "address": "Plot 3B, Block A10, Admiralty Way, Lekki Phase 1, Lagos",
+    "description": "However you want it, your place, your time!",
+    "contactNumber": "07059987031",
+    "image": "https://explain.com.ng/wp-content/uploads/2020/11/The-place-ogba.jpg"
+  },
+  {
+    "name": "Debonairs Pizza",
+    "address": "Ikeja City Mall, Obafemi Awolowo Way, Alausa, Ikeja, Lagos, Lagos, Nigeria",
+    "description": "It's the way you like it!",
+    "contactNumber": "09060008751",
+    "image": "https://www.businesslist.com.ng/img/ng/c/1543174181-47-debonairs-pizza.png"
+  }
+]

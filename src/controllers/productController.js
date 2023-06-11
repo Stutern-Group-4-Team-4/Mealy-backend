@@ -1,288 +1,238 @@
-
-const Dishes = require('../model/Dishes');
-const Cart = require('../model/Cart');
-const User = require('../model/user');
-const userCart = require('../model/userCart');
-const { UnAuthorizedError, BadUserRequestError } = require('../error/error');
-
+const Dishes = require("../model/Dishes");
+const localDishes = require("../model/localDishes");
+const continentalDishes = require("../model/ContinentalDishes");
+const trending = require("../model/trending");
+const User = require("../model/user");
+const { UnAuthorizedError, BadUserRequestError } = require("../error/error");
 
 // Send the response to the client with or without errors
-function sendStatus(msg, status = 0, data, err = false){
-    return {
-      message: msg,
-      status: status,
-      data: data,
-      error: err
-    };
+function sendStatus(msg, status = 0, data, err = false) {
+  return {
+    message: msg,
+    status: status,
+    data: data,
+    error: err,
+  };
+}
+
+class productController {
+  //Get a list of all dishes in the 'all' category
+  static async allDishes(req, res) {
+    try {
+      const allFoods = await Dishes.find({ available: true });
+      return res.status(200).json({
+        message: `Welcome to this foodOrdering site.`,
+        data: allFoods,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
-class productController{
-  updateUserCart(req, res, msg, data = false){
-    const userId = req.session.uid;
-    const cart = new Cart(req.session['cart']? req.session['cart']:{});
-    const cartData = cart.getListDB();
-    const totalQty = cart.totalQty;
-    const totalPrice = cart.totalPrice;
+  //Get food details
+  static async FoodDetails(req, res, next) {
+    try {
+      const foodId = req.params.id;
+      const foodDetails = await Dishes.findById(foodId);
+      return res.status(200).json(foodDetails);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-    userCart.findOne({userId: userId},(err, usercart)=>{
-      if(err){res.send(sendStatus(msg, 1, data, err))}
-      else if(usercart){
-        usercart.totalPrice = totalPrice;
-        usercart.totalQty = totalQty;
-        usercart.data = cartData;
-        usercart.save(err=>{
-          if(err){
-            res.send(sendStatus(msg, 1,data, err))
-          }
-          else res.send(sendStatus(msg, 1, data));
-        })
-      }
-      else{
-        const newUserCart = new userCart({
-          userId: userId,
-          totalQty: totalQty,
-          totalPrice: totalPrice,
-          data: cartData
-        });
-        newUserCart.save(err=>{
-          if(err){
-            res.send(sendStatus(msg, 1, data, err))
-          }else res.send(sendStatus(msg, 1, data))
-        })
-      }
-    })
-  };
-
-  //Get a list of all dishes in the 'all' category
-  allDishes(req,res){
-    Dishes.find((err, allDishes)=>{
-      if(err){
+  //Get a list of all local dishes in the 'Local' category
+  static async localDishes(req, res) {
+    await localDishes.find((err, localDishes) => {
+      if (err) {
         console.log(err);
-      }else{
-        res.send(allDishes)
+      } else {
+        res.send(localDishes);
       }
-    })
-  };
-
-  //Get a specific dish in the 'all' category
-  specificDish (req,res){
-    console.log(req.params.id);
-    Dishes.findOne({_id: req.params.id}, (err, specificDish)=>{
-      if(err){
-        res.send(err)
-      }else{
-        res.send(specificDish)
-      }
-    })
-   };
-
-   //Get a list of all local dishes in the 'Local' category
-   localDishes (req,res){
-    Dishes.find((err, localDishes)=>{
-      if(err){
-        console.log(err);
-      }else{
-        res.send(localDishes)
-      }
-    })
-  };
+    });
+  }
 
   //Get a list of all continental dishes in the 'Continental' category
-   continentalDishes (req,res){
-    Dishes.find((err, continentalDishes)=>{
-      if(err){
+  static async continentalDishes(req, res) {
+    await continentalDishes.find((err, continentalDishes) => {
+      if (err) {
         console.log(err);
-      }else{
-        res.send(continentalDishes)
+      } else {
+        res.send(continentalDishes);
       }
-    })
-  };
-
+    });
+  }
 
   //Get a specific local dish in the 'Local' category
-   locDish (req,res){
-    console.log(req.params.id);
-    Dishes.findOne({_id: req.params.id}, (err, locDish)=>{
-      if(err){
-        res.send(err)
-      }else{
-        res.send(locDish)
-      }
-    })
-   };
+  // static async locDish (req,res){
+  //   console.log(req.params.id);
+  //  await localDishes.findOne({_id: req.params.id}, (err, locDish)=>{
+  //     if(err){
+  //       res.send(err)
+  //     }else{
+  //       res.send(locDish)
+  //     }
+  //   })
+  //  };
 
-   //Get a specific continental dish in the 'continental' category
-   continentalDish (req,res){
-    console.log(req.params.id);
-    Dishes.findOne({_id: req.params.id}, (err, locDish)=>{
-      if(err){
-        res.send(err)
-      }else{
-        res.send(continentalDish)
-      }
-    })
-   };
-
-
-   //basic functionality is just to add an item to the cart session by using Cart.js class. If the user is signed in then it further adds that item to the userCart.js model with the userid by taking help of function updateUserCart(req, res, msg, data = false) written in same CartControllers.js file.
-   addCart(req, res){
-    const {item} = req.body;
-    const cart = new Cart(req.session['cart']? req.session['cart']:{});
-    cart.add(item, item.id);
-    req.session['cart']= cart;
-    const success_msg = 'ITEM_ADDED_SUCCESSFULLY';
-    if(!req.session['email']){
-      res.send(sendStatus(success_msg, 1, false))
-    }else{
-      updateUserCart(req,res,success_msg)
-    }
-  
-  };
-
+  //Get a specific continental dish in the 'continental' category
+  // static async continentalDish (req,res){
+  //   console.log(req.params.id);
+  //  await continentalDishes.findOne({_id: req.params.id}, (err, continentalDish)=>{
+  //     if(err){
+  //       res.send(err)
+  //     }else{
+  //       res.send(continentalDish)
+  //     }
+  //   })
+  //  };
 
   //search functionality
-  searchProduct(req,res){
-    const{restaurant, food, drink}= req.query
+  static async searchProduct(req, res) {
+    const { restaurant, food, drink } = req.query;
     const queryObject = {};
-    if(restaurant){
-      queryObject['name.restaurant'] = {$regex: restaurant, $options: 'i'}
-  }
-  if(food){
-      queryObject['name.food.name'] = {$regex: food, $options: 'i'}
-  }
-  if(drink){
-      queryObject['name.drink.name'] = {$regex: drink, $options: 'i'}
-  }
-  const product =  Dishes.find(queryObject)
-  if(!product || product.length === 0){
-      throw new BadUserRequestError("Product you requested for not found")
-  }
-  res.status(200).json({
-      status:"Success",
-      data:product
-  })
+    if (restaurant) {
+      queryObject["name.restaurant"] = { $regex: restaurant, $options: "i" };
     }
-  
-
+    if (food) {
+      queryObject["name.food.name"] = { $regex: food, $options: "i" };
+    }
+    if (drink) {
+      queryObject["name.drink.name"] = { $regex: drink, $options: "i" };
+    }
+    const product = await Dishes.find(queryObject);
+    if (!product || product.length === 0) {
+      throw new BadUserRequestError("Product you requested for not found");
+    }
+    res.status(200).json({
+      status: "Success",
+      data: product,
+    });
+  }
 
   //returns the item present in the cart. If a user is signed in it gets the data from the userCart.js model otherwise from the session.
-  fetchCart (req,res){
-    if(req.session['email'] && !req.session['cart']){
-      const userId = req.session.uid;
-      userCart.findOne({userId: userId}, async (err, usercart)=>{
-        if(err){
-          res.send(sendStatus(msg, 1, false, err))
-        }else if(usercart){
-          const data = usercart.data;
-          const cart = new Cart(req.session['cart'] ? req.session['cart'] : {});
-          for (var i = 0; i<data.length; i++){
-            const id = data[i].itemId;
-            const locDish = await this.localDishes.findOne({_id: id});
-            locDish['quantity']= data[i].itemQty;
-            cart.add(locDish, id)
-          }
-          req.session['cart']=cart;
-          const c = cart.getList();
-          res.send(c)
-        }else{
-          res.send(sendStatus("Something went wrong", 1, false))
-        }
-      })
-    }else{
-      const cart = new Cart(req.session['cart']?req.session['cart']:{})
-      const c = cart.getList();
-      res.send(c)
-    }
-  };
-
-
-  //This method is called when the req POST /api/update_cart is made along with the updated cart items details like quantity or removal of some items. If a user is signed in it takes help from a helper function updateUserCart(req, res, msg, data = false) like others to update the details.
-  updateCart (req,res){
-    const item = req.body;
-    const cart = new Cart({});
-    cart.update(item);
-    req.session['cart']=cart;
-    const success_msg = 'UPDATE_SUCCESS';
-    if(!req.session['email']){
-      res.send(sendStatus(success_msg, 1, false));
-    }else{
-      this.updateUserCart(req,res,success_msg);
-    }
-  };
-
-  //delete item from cart
-  deleteItem(req,res){
-    try{
-      const product=Dishes.findByIdAndDelete(req.params.id)
-      if(!product){
-        throw new UnAuthorizedError('Product not found')
-      }
-      res.status(200).json({
-        status: 'success',
-        message:'Item has been deleted'
-      })
-    }catch(err){
-      res.status(500).json({message:err.message})
-    }
-  };
+  //  static async fetchCart (req,res){
+  //     if(req.session['email'] && !req.session['cart']){
+  //       const userId = req.session.uid;
+  //      await userCart.findOne({userId: userId}, async (err, usercart)=>{
+  //         if(err){
+  //           res.send(sendStatus(msg, 1, false, err))
+  //         }else if(usercart){
+  //           const data = usercart.data;
+  //           const cart = new Cart(req.session['cart'] ? req.session['cart'] : {});
+  //           for (var i = 0; i<data.length; i++){
+  //             const id = data[i].itemId;
+  //             const locDish = await this.localDishes.findOne({_id: id});
+  //             locDish['quantity']= data[i].itemQty;
+  //             cart.add(locDish, id)
+  //           }
+  //           req.session['cart']=cart;
+  //           const c = cart.getList();
+  //           res.send(c)
+  //         }else{
+  //           res.send(sendStatus("Something went wrong", 1, false))
+  //         }
+  //       })
+  //     }else{
+  //       const cart = new Cart(req.session['cart']?req.session['cart']:{})
+  //       const c = cart.getList();
+  //       res.send(c)
+  //     }
+  //   };
 
   //create product review
-  productReview(req,res) {
-    try{
-    const {rating, comment} = req.body
-    const product = Dishes.findById({_id:req.params.id})
-    if(product){
+  static async productReview(req, res) {
+    try {
+      const { rating, comment } = req.body;
+      const product = await Dishes.findById({ _id: req.params.id });
+      if (product) {
         const alreadyReviewed = product.reviews.find(
-            (r) => r.user.toString() === req.user._id.toString()
-        )
-        if(alreadyReviewed){
-            throw new UnAuthorizedError("Product review already exists")
+          (r) => r.user.toString() === req.user._id.toString()
+        );
+        if (alreadyReviewed) {
+          throw new UnAuthorizedError("Product review already exists");
         }
         const review = {
-            name: req.user.name,
-            rating: Number(rating),
-            comment,
-            user: req.user._id
-        }
-        product.reviews.push(review)
-        product.numReview = product.reviews.length
-        product.rating = product.reviews.reduce((acc,item) => item.rating + acc, 0)/product.reviews.length
-         product.save()
-        res.status(201).json({message:"Review added"})
-    }else{
-        throw new BadUserRequestError("Product review failed")
-    }
-}catch(err){
-    res.status(500).json({message:err.message})
-}
-}
-
-
-  addAddress(req,res){
-    if(req.session['email']){
-        req.session['address']=req.body;
-        res.send(sendStatus('ADDED_ADDRESS', 1, false))
-    }else{
-        res.send(sendStatus('Nothing to add', 0, false))
-    }
-  };
-
-  fetchAddress (req,res){
-    if(req.session['email']){
-        User.findOne({email: req.session['email']}, {address:1},(err,data)=>{
-            if(err) res.send(err);
-            else{
-                console.log(data);
-                data['status']=1;
-                res.send(data);
-            }
-        })
-    }else{
-        res.send(sendStatus('Nothing to fetch', 0, false))
+          name: req.user.name,
+          rating: Number(rating),
+          comment,
+          user: req.user._id,
+        };
+        product.reviews.push(review);
+        product.numReview = product.reviews.length;
+        product.rating =
+          product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+          product.reviews.length;
+        product.save();
+        res.status(201).json({ message: "Review added" });
+      } else {
+        throw new BadUserRequestError("Product review failed");
+      }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
     }
   }
 
+  //Get a list of all trending dishes
+  static async trendingDishes(req, res) {
+    try {
+      const trendingFoods = await trending.find({ available: true });
+      return res.status(200).json({
+        message: `See the trending food by orders`,
+        data: trendingFoods,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 
-} 
+  //Get a specific trending food
+  static async trendingFood(req, res, next) {
+    try {
+      const foodId = req.params.id;
+      const foodDetails = await trending.findById(foodId);
+      return res.status(200).json(foodDetails);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-module.exports = productController
+  static async deleteTrendingFood(req, res, next) {
+    try {
+      let foodId = req.params.id
+      let foundFood = await trending.findOne({_id: foodId})
+      if (!foundFood) {
+        const err = new Error()
+        err.name = "Not Found"
+        err.status = 404
+        err.message = "The food you are looking for wasn't found"
+        throw err
+      }
+      
+      const del = await foundFood.deleteOne()
+      res.json({"message": `${del.name} was deleted successfully`})
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async fetchAddress(req, res) {
+    if (req.session["email"]) {
+      await User.findOne(
+        { email: req.session["email"] },
+        { address: 1 },
+        (err, data) => {
+          if (err) res.send(err);
+          else {
+            console.log(data);
+            data["status"] = 1;
+            res.send(data);
+          }
+        }
+      );
+    } else {
+      res.send(sendStatus("Nothing to fetch", 0, false));
+    }
+  }
+}
+
+module.exports = productController;
