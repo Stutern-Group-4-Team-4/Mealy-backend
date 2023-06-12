@@ -26,7 +26,7 @@ router.patch(
   "/updatepassword/:token",
   tryCatchHandler(UserController.updatePassword)
 );
-router.get("/", tryCatchHandler(UserController.findUser));
+router.get("/search-user", tryCatchHandler(UserController.findUser));
 router.get("/users", tryCatchHandler(UserController.findAll));
 router.delete("/deleteall", tryCatchHandler(UserController.deleteAll));
 router.delete("/deleteuser/:id", tryCatchHandler(UserController.deleteUser));
@@ -37,6 +37,7 @@ router.get("/logout", UserController.userLogout);
 router.get("/search", productController.searchProduct);
 router.get("/alldishes", tryCatchHandler(productController.allDishes));
 router.get("/getfooddetails", tryCatchHandler(productController.FoodDetails));
+router.get("/alldrinks", tryCatchHandler(productController.allDrinks));
 router.get("/trending", productController.trendingDishes);
 router.get("/trending/:id", tryCatchHandler(productController.trendingFood));
 router.delete("/trending/:id=", tryCatchHandler(productController.deleteTrendingFood));
@@ -48,9 +49,10 @@ router.post("/:id/review", tryCatchHandler(productController.productReview));
 
 router.use("/admin", require("./admin-route"));
 
-router.use("/user/ordering", require("./order-route"));
 
-router.use("/user/cart", require("./cart-route"));
+router.use("/ordering", require("./order-route"));
+
+router.use("/cart", require("./cart-route"));
 
 //reservation route
 router.use("/bookreservation", require("./reservationRoute"));

@@ -316,7 +316,7 @@ static async requestPasswordReset(req, res, next) {
           createdAt: Date.now()
       }).save()
 
-      const link = `http://localhost:3000/api/v1/user/resetpassword?userId=${user._id}&resetToken=${resetPasswordToken}`
+      const link = `https://mealy-app-u2hp.onrender.com/api/v1/user/resetpassword?userId=${user._id}&resetToken=${resetPasswordToken}`
       
       const mailSent = transport.sendMail({
           from: "emmanuelomenaka@gmail.com",   

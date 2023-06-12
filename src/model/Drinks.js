@@ -8,6 +8,11 @@ const drinksSchema = new Schema({
     category: {
         type: String
     },
+    available: {
+        type: Boolean,
+        default: false
+    },
+
     description: {
         type: String
     },

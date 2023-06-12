@@ -1,6 +1,6 @@
+const Restaurant = require('../model/Restaurant')
 const Dishes = require("../model/Dishes");
-const localDishes = require("../model/localDishes");
-const continentalDishes = require("../model/ContinentalDishes");
+const Drinks = require('../model/Drinks');
 const trending = require("../model/trending");
 const User = require("../model/user");
 const { UnAuthorizedError, BadUserRequestError } = require("../error/error");
@@ -16,12 +16,12 @@ function sendStatus(msg, status = 0, data, err = false) {
 }
 
 class productController {
-  //Get a list of all dishes in the 'all' category
+  //Get a list of all dishes
   static async allDishes(req, res) {
     try {
       const allFoods = await Dishes.find({ available: true });
       return res.status(200).json({
-        message: `Welcome to this foodOrdering site.`,
+        message: `Successfully found ${allFoods.length} dishes`,
         data: allFoods,
       });
     } catch (error) {
@@ -29,7 +29,7 @@ class productController {
     }
   }
 
-  //Get food details
+  //Get food details of a given food
   static async FoodDetails(req, res, next) {
     try {
       const foodId = req.params.id;
@@ -42,24 +42,83 @@ class productController {
 
   //Get a list of all local dishes in the 'Local' category
   static async localDishes(req, res) {
-    await localDishes.find((err, localDishes) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.send(localDishes);
-      }
+    const allLocalFoods = await Dishes.find({category: "Local"});
+    return res.status(200).json({
+      message: `Successfully found ${allLocalFoods.length} local foods`,
+      data: allLocalFoods
     });
+
   }
 
   //Get a list of all continental dishes in the 'Continental' category
   static async continentalDishes(req, res) {
-    await continentalDishes.find((err, continentalDishes) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.send(continentalDishes);
-      }
+    const allContinentalFoods = await Dishes.find({category: "Continental"});
+    return res.status(200).json({
+      message: `Successfully found ${allContinentalFoods.length} continental foods`,
+      data: allContinentalFoods
     });
+
+  };
+
+  //Get a list of all drinks 
+  static async allDrinks(req, res) {
+    try {
+      const allDrinks = await Drinks.find({ available: true });
+      return res.status(200).json({
+        message: `Successfully found ${allDrinks.length} Drinks`,
+        data: allDrinks,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  //Get drink details of any drink
+  static async DrinkDetails(req, res, next) {
+    try {
+      const drinkId = req.params.id;
+      const drinkDetails = await Drinks.findById(drinkId);
+      return res.status(200).json(drinkDetails);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+   //Get a list of all drinks in the 'Soda' category
+   static async Soda(req, res) {
+    const allSoda = await Drinks.find({category: "Soda", available: true });
+    return res.status(200).json({
+      message: `Successfully found ${allSoda.length} soda drinks`,
+      data: allSoda
+    });
+
+  }
+   //Get a list of all drinks in the 'Wine' category
+   static async Wine(req, res) {
+    const allWine = await Drinks.find({category: "Wine", available: true});
+    return res.status(200).json({
+      message: `Successfully found ${allWine.length} wine drinks`,
+      data: allWine
+    });
+
+  }
+   //Get a list of all drinks in the 'Soda' category
+   static async Juice(req, res) {
+    const allJuice = await Drinks.find({category: "Juice", available: true});
+    return res.status(200).json({
+      message: `Successfully found ${allJuice.length} juice drinks`,
+      data: allJuice
+    });
+
+  }
+   //Get a list of all drinks in the 'Soda' category
+   static async Beer(req, res) {
+    const allBeer = await Drinks.find({category: "Beer", available: true});
+    return res.status(200).json({
+      message: `Successfully found ${allBeer.length} beer drinks`,
+      data: allBeer
+    });
+
   }
 
   //Get a specific local dish in the 'Local' category
@@ -88,18 +147,18 @@ class productController {
 
   //search functionality
   static async searchProduct(req, res) {
-    const { restaurant, food, drink } = req.query;
+    const { restaurantName, food, drink } = req.query;
     const queryObject = {};
-    if (restaurant) {
-      queryObject["name.restaurant"] = { $regex: restaurant, $options: "i" };
+    if (restaurantName) {
+      queryObject["restaurantName"] = { $regex: restaurantName, $options: "i" };
     }
     if (food) {
-      queryObject["name.food.name"] = { $regex: food, $options: "i" };
+      queryObject["food.name"] = { $regex: food, $options: "i" };
     }
     if (drink) {
-      queryObject["name.drink.name"] = { $regex: drink, $options: "i" };
+      queryObject["drink.name"] = { $regex: drink, $options: "i" };
     }
-    const product = await Dishes.find(queryObject);
+    const product = await Restaurant.find(queryObject);
     if (!product || product.length === 0) {
       throw new BadUserRequestError("Product you requested for not found");
     }

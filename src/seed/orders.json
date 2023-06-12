@@ -1,0 +1,14 @@
+{
+  "_id": "1",
+  "$orderId": "648606693237c060fc9f5825",
+  "items": [
+    { "name": "Wings", "category": "continental dishes", "price": 1500 },
+    { "name": "Moet & Chandon", "category": "Wine", "price": 4000 }
+  ],
+  "address": "No 3, Freedom Estate, Ikorodu, Lagos.",
+  "phoneno": "7059944977",
+  "totalAmount": 5500,
+  "isDelivered": false,
+  "orderDate": "2023-08-23T20:00:03.511Z",
+  "paidThrough": "card"
+}
