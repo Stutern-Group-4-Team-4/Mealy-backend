@@ -23,6 +23,8 @@ const { config } = require("./src/config/index.js");
 const cookieParser = require("cookie-parser");
 const session = require("cookie-session");
 
+const cors = require("cors");
+
 //Passport
 const passport = require("passport");
 // const cookieSession = require('cookie-session');
@@ -50,6 +52,7 @@ const port = process.env.PORT || 3000;
 
 app.use(morgan("tiny"));
 app.use(cookieParser());
+app.use(cors());
 
 // app.get('/', (req,res)=>{
 //   res.send('<h1>Email Project</h1><a href = '/send'>send email</a>')
@@ -108,6 +111,11 @@ app.use("/api/v1/user", router);
 app.use("/auth/google", authRouter);
 app.use("/auth/facebook", facebookRouter);
 app.use("/api/res", restaurantRoute);
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+)
 
 //Setting Up The Port
 app.listen(port, () => {
