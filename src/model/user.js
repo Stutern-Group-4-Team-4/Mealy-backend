@@ -35,6 +35,12 @@ const userSchema = new Schema({
       min: 8,
       max: 16,
     },
+    confirmPassword: {
+      type: String,
+      required: true,
+      min: 8,
+      max: 16,
+    },
   
     isVerified: {
       type: Boolean,
