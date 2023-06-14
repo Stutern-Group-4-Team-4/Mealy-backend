@@ -8,7 +8,7 @@ const tryCatchHandler = require("../middlewares/tryCatchHandler");
 require("dotenv").config();
 
 // Setting up the User signup/login routes
-router.post("/signup", tryCatchHandler(UserController.createUser));
+router.patch("/signup", tryCatchHandler(UserController.createUser));
 router.get("/getotp", tryCatchHandler(UserController.sendVerificationCode));
 router.get(
   "/resendotp",

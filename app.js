@@ -69,12 +69,12 @@ app.use(express.json());
 app.use("/", express.static(path.join(__dirname, "/public")));
 
 //Global Error Handler
-app.use((err, req, res, next) => {
-  return res.status(err.status || 404).json({
-    message: err.message,
-    status: "Failed",
-  });
-});
+// app.use((err, req, res, next) => {
+//   return res.status(err.status || 404).json({
+//     message: err.message,
+//     status: "Failed",
+//   });
+// });
 
 // built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({ extended: false }));
