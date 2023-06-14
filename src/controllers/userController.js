@@ -44,8 +44,6 @@ const transport = nodemailer.createTransport(
       if (existingUser) {
         if (existingUser.isVerified) {
           throw new BadUserRequestError(`An account with ${email} already exists.`);
-        } else {
-          throw new BadUserRequestError(`Please login with ${email} to get your verification link.`);
         }
       }
        
