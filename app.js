@@ -22,7 +22,7 @@ const morgan = require("morgan");
 const { config } = require("./src/config/index.js");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
-const MongoStore = require('connect-mongo');
+const MongoStore = require("connect-mongo");
 
 //Passport
 const passport = require("passport");
@@ -84,7 +84,10 @@ const oneDay = 1000 * 60 * 60 * 24; //creating 24 hours from milliseconds
 app.use(
   session({
     secret: "keyboard warrior",
-    store: MongoStore.create(options),
+    store: MongoStore.create({
+      mongoURL:
+        "mongodb+srv://dejioyelakin:Possibility2+@cluster0.vccc0w4.mongodb.net/MEALY?retryWrites=true&w=majority",
+    }),
     saveUninitialized: true,
     cookie: { maxAge: oneDay },
     resave: false,
