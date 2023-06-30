@@ -68,8 +68,10 @@ const User = require("./src/model/user.js");
 //built-in middleware for json
 app.use(express.json());
 
-//serve static files
-app.use("/", express.static(path.join(__dirname, "/public")));
+
+app.get("/", (req, res)=>{
+  res.sendStatus(200)
+});
 
 //Global Error Handler
 // app.use((err, req, res, next) => {
