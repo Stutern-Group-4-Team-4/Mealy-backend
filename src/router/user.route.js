@@ -57,7 +57,6 @@ router.use("/cart", require("./cart-route"));
 //reservation route
 router.use("/bookreservation", require("./reservationRoute"));
 
-//check for availability of restaurants
-router.use("/availability", require("./AvailabilityRoute"))
+
 
 module.exports = router;

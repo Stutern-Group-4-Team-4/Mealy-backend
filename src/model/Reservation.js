@@ -10,7 +10,10 @@ const reservationSchema = new mongoose.Schema({
   email: {
     type: String,
   },
-});
+  date: {
+    type: Date
+}
+})
 
 const Reservation = mongoose.model('Reservation', reservationSchema);
 
