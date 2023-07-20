@@ -16,6 +16,10 @@ const createUserValidator = Joi.object({
   confirmPassword: Joi.string().valid(Joi.ref('password')).required()
 }).strict()
 
+const verifyOtpValidator = Joi.object({
+  verifyEmailToken: Joi.number().required(),
+});
+
 
 const loginUserValidator = Joi.object({
   email: Joi.string().required(),
@@ -45,4 +49,4 @@ const updatePasswordValidator = Joi.object({
     .messages({ "any.only": "Passwords have to match" }),
 });
 
-module.exports = {createUserValidator, loginUserValidator, resetPasswordValidator, updatePasswordValidator};
+module.exports = {createUserValidator, verifyOtpValidator, loginUserValidator, resetPasswordValidator, updatePasswordValidator};
