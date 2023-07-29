@@ -3,6 +3,7 @@ const router = express.Router();
 
 const UserController = require("../controllers/userController");
 const productController = require("../controllers/productController");
+const propertyController = require("../controllers/propertyController")
 const tryCatchHandler = require("../middlewares/tryCatchHandler");
 
 require("dotenv").config();
@@ -56,6 +57,12 @@ router.use("/cart", require("./cart-route"));
 
 //reservation route
 router.use("/bookreservation", require("./reservationRoute"));
+
+//property routes
+router.post("/property", propertyController.createProperty);
+router.get("/property/all", propertyController.getAllProperties);
+router.get("/property/featured", propertyController.getFeatured);
+router.get("/property/all-from-type", propertyController.getAllFromType);
 
 
 
